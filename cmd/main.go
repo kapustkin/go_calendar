@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/kapustkin/go_ms_template/internal"
+	"github.com/kapustkin/go_calendar/internal"
 )
 
 func main() {

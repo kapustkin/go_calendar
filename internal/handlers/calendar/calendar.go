@@ -8,27 +8,31 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_ms_template/internal/storage"
-	"github.com/kapustkin/go_ms_template/models"
+	"github.com/kapustkin/go_calendar/internal/storage"
+	"github.com/kapustkin/go_calendar/models"
 )
 
 const userFieldName string = "user"
+const errReadBody string = "Error read body"
+const errParsing string = "Error parsing payload"
+const errNotFound string = "Event not found"
 
 // AddEvent for user
 func AddEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errReadBody, http.StatusForbidden)
 	}
 	var data models.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errParsing, http.StatusForbidden)
 	}
 	uuid, err := uuid.NewUUID()
 	if err != nil {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
+
 	event := models.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
 
 	user := chi.URLParam(req, userFieldName)
@@ -39,17 +43,17 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 func EditEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errReadBody, http.StatusForbidden)
 	}
 	var data models.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errParsing, http.StatusForbidden)
 	}
 
 	user := chi.URLParam(req, userFieldName)
 	if !storage.EditEvent(user, data) {
-		http.Error(res, "Event not found", http.StatusInternalServerError)
+		http.Error(res, errNotFound, http.StatusNotFound)
 	}
 }
 
@@ -57,17 +61,17 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errReadBody, http.StatusForbidden)
 	}
 	var data models.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, errParsing, http.StatusNotImplemented)
 	}
 
 	user := chi.URLParam(req, userFieldName)
 	if !storage.RemoveEvent(user, data) {
-		http.Error(res, "Event not found", http.StatusInternalServerError)
+		http.Error(res, errNotFound, http.StatusNotFound)
 	}
 }
 

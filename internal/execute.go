@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/kapustkin/go_ms_template/controllers/calendar"
-	"github.com/kapustkin/go_ms_template/internal/config"
-	"github.com/kapustkin/go_ms_template/internal/logger"
+	"github.com/kapustkin/go_calendar/internal/handlers/calendar"
+	"github.com/kapustkin/go_calendar/internal/config"
+	"github.com/kapustkin/go_calendar/internal/logger"
 	"github.com/sirupsen/logrus"
 )
 
