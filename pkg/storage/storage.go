@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_calendar/models"
+	"github.com/kapustkin/go_calendar/pkg/models"
 )
 
 // Storage структура хранилища

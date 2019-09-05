@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package calendar;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "calendarpb";
+
+service CalendarEvents {
+    rpc Get(GetRequest) returns (EventResponse);
+    rpc GetAll(GetAllRequest) returns (AllEventResponse);
+    rpc Add(AddRequest) returns (OperationStatusResponse);
+    rpc Edit(EditRequest) returns (OperationStatusResponse);
+    rpc Remove(RemoveRequst) returns (OperationStatusResponse);
+}
+
+message Event {
+    string uuid = 1;
+    google.protobuf.Timestamp date = 2;
+    string message = 3;
+}
+
+message GetRequest {
+    string user = 1;
+    string uuid = 2;
+}
+
+message EventResponse {
+    Event event = 1;
+}
+
+message GetAllRequest {
+    string user = 1;
+}
+
+message AllEventResponse {
+    repeated Event events = 1;
+}
+
+message AddRequest {
+    string user = 1;
+    Event event = 2;
+}
+
+message EditRequest {
+    string user = 1;
+    Event event = 2;
+}
+
+message RemoveRequst {
+    string user = 1;
+    string uuid = 2;
+}
+
+message OperationStatusResponse {
+    bool sucess = 1;
+}
+

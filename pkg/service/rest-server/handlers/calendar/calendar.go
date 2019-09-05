@@ -8,8 +8,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_calendar/internal/storage"
-	"github.com/kapustkin/go_calendar/models"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
+	"github.com/kapustkin/go_calendar/pkg/storage"
+	"github.com/kapustkin/go_calendar/pkg/models"
 )
 
 const userFieldName string = "user"
@@ -36,7 +37,14 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 	event := models.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
 
 	user := chi.URLParam(req, userFieldName)
-	storage.AddEvent(user, event)
+	result, err := dal.AddEvent(user, event)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+	if !result {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 }
 
 // EditEvent for user
@@ -78,7 +86,10 @@ func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 // GetEvents all events for user
 func GetEvents(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
-	events := storage.GetAllEvents(user)
+	events, err := dal.GetAllEvents(user)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
 	data, err := json.Marshal(events)
 	if err != nil {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)

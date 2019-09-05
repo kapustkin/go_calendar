@@ -1,4 +1,4 @@
-package internal
+package rest
 
 import (
 	"fmt"
@@ -8,9 +8,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/kapustkin/go_calendar/internal/handlers/calendar"
-	"github.com/kapustkin/go_calendar/internal/config"
-	"github.com/kapustkin/go_calendar/internal/logger"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/config"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
 	"github.com/sirupsen/logrus"
 )
 
