@@ -11,8 +11,8 @@ import (
 )
 
 // Run запуск GRPC сервера
-func Run() error {
-	lis, err := net.Listen("tcp", "0.0.0.0:5900")
+func Run(addres string) error {
+	lis, err := net.Listen("tcp", addres)
 	if err != nil {
 		log.Fatalf("failed to listen %v", err)
 	}
@@ -21,7 +21,6 @@ func Run() error {
 	reflection.Register(grpcServer)
 
 	calendarpb.RegisterCalendarEventsServer(grpcServer, &calendar.CalendarServer{})
-	grpcServer.Serve(lis)
-
+	err = grpcServer.Serve(lis)
 	return err
 }

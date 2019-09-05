@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	err := grpc.Run()
+	err := grpc.Run("0.0.0.0:5900")
 	if err != nil {
 		log.Fatal(err)
 	}

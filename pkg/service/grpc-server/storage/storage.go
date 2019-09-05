@@ -17,6 +17,17 @@ var (
 	storage Storage
 )
 
+// GetAllEvents return all user events
+func GetAllEvents(user string) []models.Event {
+	storage.RLock()
+	defer storage.RUnlock()
+	data := []models.Event{}
+	for _, value := range storage.data[user] {
+		data = append(data, value)
+	}
+	return data
+}
+
 // AddEvent element to storage
 func AddEvent(user string, event models.Event) bool {
 	storage.Lock()
@@ -54,25 +65,14 @@ func EditEvent(user string, event models.Event) bool {
 }
 
 // RemoveEvent remove event
-func RemoveEvent(user string, event models.Event) bool {
+func RemoveEvent(user string, uuid uuid.UUID) bool {
 	storage.Lock()
 	defer storage.Unlock()
 
-	if _, ok := storage.data[user][event.UUID]; ok {
-		delete(storage.data[user], event.UUID)
+	if _, ok := storage.data[user][uuid]; ok {
+		delete(storage.data[user], uuid)
 		return true
 	}
 
 	return false
-}
-
-// GetAllEvents return all user events
-func GetAllEvents(user string) []models.Event {
-	storage.Lock()
-	defer storage.Unlock()
-	data := []models.Event{}
-	for _, value := range storage.data[user] {
-		data = append(data, value)
-	}
-	return data
 }

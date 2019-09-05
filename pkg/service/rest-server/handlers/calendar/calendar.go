@@ -8,15 +8,28 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
-	"github.com/kapustkin/go_calendar/pkg/storage"
 	"github.com/kapustkin/go_calendar/pkg/models"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 )
 
 const userFieldName string = "user"
 const errReadBody string = "Error read body"
 const errParsing string = "Error parsing payload"
 const errNotFound string = "Event not found"
+
+// GetEvents all events for user
+func GetEvents(res http.ResponseWriter, req *http.Request) {
+	user := chi.URLParam(req, userFieldName)
+	events, err := dal.GetAllEvents(user)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	data, err := json.Marshal(events)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+	res.Write(data)
+}
 
 // AddEvent for user
 func AddEvent(res http.ResponseWriter, req *http.Request) {
@@ -53,15 +66,19 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
-	var data models.Event
-	err = json.Unmarshal(body, &data)
+	var event models.Event
+	err = json.Unmarshal(body, &event)
 	if err != nil {
 		http.Error(res, errParsing, http.StatusForbidden)
 	}
-
 	user := chi.URLParam(req, userFieldName)
-	if !storage.EditEvent(user, data) {
-		http.Error(res, errNotFound, http.StatusNotFound)
+	result, err := dal.EditEvent(user, event)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	}
+
+	if !result {
+		http.Error(res, "no record for edit", http.StatusNotFound)
 	}
 }
 
@@ -78,21 +95,12 @@ func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	}
 
 	user := chi.URLParam(req, userFieldName)
-	if !storage.RemoveEvent(user, data) {
-		http.Error(res, errNotFound, http.StatusNotFound)
+	result, err := dal.RemoveEvent(user, data.UUID)
+	if err != nil {
+		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
-}
 
-// GetEvents all events for user
-func GetEvents(res http.ResponseWriter, req *http.Request) {
-	user := chi.URLParam(req, userFieldName)
-	events, err := dal.GetAllEvents(user)
-	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if !result {
+		http.Error(res, "no record for remove", http.StatusNotFound)
 	}
-	data, err := json.Marshal(events)
-	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-	}
-	res.Write(data)
 }

@@ -8,8 +8,9 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/config"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
 	"github.com/sirupsen/logrus"
 )
@@ -17,6 +18,8 @@ import (
 // Run основной обработчик
 func Run(args []string) error {
 	c := config.InitConfig()
+	// Data Access Layer инициализация
+	dal.Init(c.GRPC)
 
 	r := chi.NewRouter()
 	// Middleware

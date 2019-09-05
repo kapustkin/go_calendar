@@ -2,11 +2,10 @@ package dal
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"time"
 
-	"github.com/kapustkin/go_calendar/pkg/api/v1"
+	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	"github.com/kapustkin/go_calendar/pkg/models"
 
 	"github.com/golang/protobuf/ptypes"
@@ -14,8 +13,14 @@ import (
 	"google.golang.org/grpc"
 )
 
-const addr = "localhost:5900"
+var addr string
+
 const timeout = 400
+
+// Init инициализация Data Access Layer
+func Init(address string) {
+	addr = address
+}
 
 // GetAllEvents return all user events
 func GetAllEvents(user string) ([]models.Event, error) {
@@ -35,7 +40,6 @@ func GetAllEvents(user string) ([]models.Event, error) {
 	}
 
 	var result []models.Event
-	fmt.Printf("result recieve: %v", events.Events)
 	for _, v := range events.Events {
 		uuid, err := uuid.Parse(v.Uuid)
 		if err != nil {
@@ -66,8 +70,53 @@ func AddEvent(user string, event models.Event) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Printf("1result recieve: %v", event)
+
 	result, err := calendar.Add(ctx, &calendarpb.AddRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	if err != nil {
+		return false, err
+	}
+
+	return result.Sucess, nil
+}
+
+// EditEvent element to storage
+func EditEvent(user string, event models.Event) (bool, error) {
+	cc, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("could not connect: %v", err)
+	}
+	defer cc.Close()
+
+	calendar := calendarpb.NewCalendarEventsClient(cc)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	defer cancel()
+
+	date, err := ptypes.TimestampProto(event.Date)
+	if err != nil {
+		return false, err
+	}
+
+	result, err := calendar.Edit(ctx, &calendarpb.EditRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	if err != nil {
+		return false, err
+	}
+
+	return result.Sucess, nil
+}
+
+// RemoveEvent element to storage
+func RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
+	cc, err := grpc.Dial(addr, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("could not connect: %v", err)
+	}
+	defer cc.Close()
+
+	calendar := calendarpb.NewCalendarEventsClient(cc)
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	defer cancel()
+
+	result, err := calendar.Remove(ctx, &calendarpb.RemoveRequst{User: user, Uuid: uuid.String()})
 	if err != nil {
 		return false, err
 	}
