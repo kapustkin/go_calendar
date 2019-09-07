@@ -7,11 +7,11 @@ import "google/protobuf/timestamp.proto";
 option go_package = "calendarpb";
 
 service CalendarEvents {
-    rpc Get(GetRequest) returns (EventResponse);
-    rpc GetAll(GetAllRequest) returns (AllEventResponse);
-    rpc Add(AddRequest) returns (OperationStatusResponse);
-    rpc Edit(EditRequest) returns (OperationStatusResponse);
-    rpc Remove(RemoveRequst) returns (OperationStatusResponse);
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Add(AddRequest) returns (AddResponse);
+    rpc Edit(EditRequest) returns (EditResponse);
+    rpc Remove(RemoveRequst) returns (RemoveResponse);
 }
 
 message Event {
@@ -25,7 +25,7 @@ message GetRequest {
     string uuid = 2;
 }
 
-message EventResponse {
+message GetResponse {
     Event event = 1;
 }
 
@@ -33,7 +33,7 @@ message GetAllRequest {
     string user = 1;
 }
 
-message AllEventResponse {
+message GetAllResponse {
     repeated Event events = 1;
 }
 
@@ -52,7 +52,14 @@ message RemoveRequst {
     string uuid = 2;
 }
 
-message OperationStatusResponse {
+message AddResponse {
     bool sucess = 1;
 }
 
+message EditResponse {
+    bool sucess = 1;
+}
+
+message RemoveResponse {
+    bool sucess = 1;
+}

@@ -127,39 +127,39 @@ func (m *GetRequest) GetUuid() string {
 	return ""
 }
 
-type EventResponse struct {
+type GetResponse struct {
 	Event                *Event   `protobuf:"bytes,1,opt,name=event,proto3" json:"event,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *EventResponse) Reset()         { *m = EventResponse{} }
-func (m *EventResponse) String() string { return proto.CompactTextString(m) }
-func (*EventResponse) ProtoMessage()    {}
-func (*EventResponse) Descriptor() ([]byte, []int) {
+func (m *GetResponse) Reset()         { *m = GetResponse{} }
+func (m *GetResponse) String() string { return proto.CompactTextString(m) }
+func (*GetResponse) ProtoMessage()    {}
+func (*GetResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3d25d49f056cdb2, []int{2}
 }
 
-func (m *EventResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_EventResponse.Unmarshal(m, b)
+func (m *GetResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetResponse.Unmarshal(m, b)
 }
-func (m *EventResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_EventResponse.Marshal(b, m, deterministic)
+func (m *GetResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetResponse.Marshal(b, m, deterministic)
 }
-func (m *EventResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_EventResponse.Merge(m, src)
+func (m *GetResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetResponse.Merge(m, src)
 }
-func (m *EventResponse) XXX_Size() int {
-	return xxx_messageInfo_EventResponse.Size(m)
+func (m *GetResponse) XXX_Size() int {
+	return xxx_messageInfo_GetResponse.Size(m)
 }
-func (m *EventResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_EventResponse.DiscardUnknown(m)
+func (m *GetResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_EventResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetResponse proto.InternalMessageInfo
 
-func (m *EventResponse) GetEvent() *Event {
+func (m *GetResponse) GetEvent() *Event {
 	if m != nil {
 		return m.Event
 	}
@@ -205,39 +205,39 @@ func (m *GetAllRequest) GetUser() string {
 	return ""
 }
 
-type AllEventResponse struct {
+type GetAllResponse struct {
 	Events               []*Event `protobuf:"bytes,1,rep,name=events,proto3" json:"events,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *AllEventResponse) Reset()         { *m = AllEventResponse{} }
-func (m *AllEventResponse) String() string { return proto.CompactTextString(m) }
-func (*AllEventResponse) ProtoMessage()    {}
-func (*AllEventResponse) Descriptor() ([]byte, []int) {
+func (m *GetAllResponse) Reset()         { *m = GetAllResponse{} }
+func (m *GetAllResponse) String() string { return proto.CompactTextString(m) }
+func (*GetAllResponse) ProtoMessage()    {}
+func (*GetAllResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3d25d49f056cdb2, []int{4}
 }
 
-func (m *AllEventResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_AllEventResponse.Unmarshal(m, b)
+func (m *GetAllResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_GetAllResponse.Unmarshal(m, b)
 }
-func (m *AllEventResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_AllEventResponse.Marshal(b, m, deterministic)
+func (m *GetAllResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_GetAllResponse.Marshal(b, m, deterministic)
 }
-func (m *AllEventResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_AllEventResponse.Merge(m, src)
+func (m *GetAllResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GetAllResponse.Merge(m, src)
 }
-func (m *AllEventResponse) XXX_Size() int {
-	return xxx_messageInfo_AllEventResponse.Size(m)
+func (m *GetAllResponse) XXX_Size() int {
+	return xxx_messageInfo_GetAllResponse.Size(m)
 }
-func (m *AllEventResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_AllEventResponse.DiscardUnknown(m)
+func (m *GetAllResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_GetAllResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_AllEventResponse proto.InternalMessageInfo
+var xxx_messageInfo_GetAllResponse proto.InternalMessageInfo
 
-func (m *AllEventResponse) GetEvents() []*Event {
+func (m *GetAllResponse) GetEvents() []*Event {
 	if m != nil {
 		return m.Events
 	}
@@ -385,39 +385,117 @@ func (m *RemoveRequst) GetUuid() string {
 	return ""
 }
 
-type OperationStatusResponse struct {
+type AddResponse struct {
 	Sucess               bool     `protobuf:"varint,1,opt,name=sucess,proto3" json:"sucess,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
 }
 
-func (m *OperationStatusResponse) Reset()         { *m = OperationStatusResponse{} }
-func (m *OperationStatusResponse) String() string { return proto.CompactTextString(m) }
-func (*OperationStatusResponse) ProtoMessage()    {}
-func (*OperationStatusResponse) Descriptor() ([]byte, []int) {
+func (m *AddResponse) Reset()         { *m = AddResponse{} }
+func (m *AddResponse) String() string { return proto.CompactTextString(m) }
+func (*AddResponse) ProtoMessage()    {}
+func (*AddResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_e3d25d49f056cdb2, []int{8}
 }
 
-func (m *OperationStatusResponse) XXX_Unmarshal(b []byte) error {
-	return xxx_messageInfo_OperationStatusResponse.Unmarshal(m, b)
+func (m *AddResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_AddResponse.Unmarshal(m, b)
 }
-func (m *OperationStatusResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
-	return xxx_messageInfo_OperationStatusResponse.Marshal(b, m, deterministic)
+func (m *AddResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_AddResponse.Marshal(b, m, deterministic)
 }
-func (m *OperationStatusResponse) XXX_Merge(src proto.Message) {
-	xxx_messageInfo_OperationStatusResponse.Merge(m, src)
+func (m *AddResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_AddResponse.Merge(m, src)
 }
-func (m *OperationStatusResponse) XXX_Size() int {
-	return xxx_messageInfo_OperationStatusResponse.Size(m)
+func (m *AddResponse) XXX_Size() int {
+	return xxx_messageInfo_AddResponse.Size(m)
 }
-func (m *OperationStatusResponse) XXX_DiscardUnknown() {
-	xxx_messageInfo_OperationStatusResponse.DiscardUnknown(m)
+func (m *AddResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_AddResponse.DiscardUnknown(m)
 }
 
-var xxx_messageInfo_OperationStatusResponse proto.InternalMessageInfo
+var xxx_messageInfo_AddResponse proto.InternalMessageInfo
 
-func (m *OperationStatusResponse) GetSucess() bool {
+func (m *AddResponse) GetSucess() bool {
+	if m != nil {
+		return m.Sucess
+	}
+	return false
+}
+
+type EditResponse struct {
+	Sucess               bool     `protobuf:"varint,1,opt,name=sucess,proto3" json:"sucess,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *EditResponse) Reset()         { *m = EditResponse{} }
+func (m *EditResponse) String() string { return proto.CompactTextString(m) }
+func (*EditResponse) ProtoMessage()    {}
+func (*EditResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e3d25d49f056cdb2, []int{9}
+}
+
+func (m *EditResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_EditResponse.Unmarshal(m, b)
+}
+func (m *EditResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_EditResponse.Marshal(b, m, deterministic)
+}
+func (m *EditResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_EditResponse.Merge(m, src)
+}
+func (m *EditResponse) XXX_Size() int {
+	return xxx_messageInfo_EditResponse.Size(m)
+}
+func (m *EditResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_EditResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_EditResponse proto.InternalMessageInfo
+
+func (m *EditResponse) GetSucess() bool {
+	if m != nil {
+		return m.Sucess
+	}
+	return false
+}
+
+type RemoveResponse struct {
+	Sucess               bool     `protobuf:"varint,1,opt,name=sucess,proto3" json:"sucess,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *RemoveResponse) Reset()         { *m = RemoveResponse{} }
+func (m *RemoveResponse) String() string { return proto.CompactTextString(m) }
+func (*RemoveResponse) ProtoMessage()    {}
+func (*RemoveResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_e3d25d49f056cdb2, []int{10}
+}
+
+func (m *RemoveResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_RemoveResponse.Unmarshal(m, b)
+}
+func (m *RemoveResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_RemoveResponse.Marshal(b, m, deterministic)
+}
+func (m *RemoveResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_RemoveResponse.Merge(m, src)
+}
+func (m *RemoveResponse) XXX_Size() int {
+	return xxx_messageInfo_RemoveResponse.Size(m)
+}
+func (m *RemoveResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_RemoveResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_RemoveResponse proto.InternalMessageInfo
+
+func (m *RemoveResponse) GetSucess() bool {
 	if m != nil {
 		return m.Sucess
 	}
@@ -427,44 +505,46 @@ func (m *OperationStatusResponse) GetSucess() bool {
 func init() {
 	proto.RegisterType((*Event)(nil), "calendar.Event")
 	proto.RegisterType((*GetRequest)(nil), "calendar.GetRequest")
-	proto.RegisterType((*EventResponse)(nil), "calendar.EventResponse")
+	proto.RegisterType((*GetResponse)(nil), "calendar.GetResponse")
 	proto.RegisterType((*GetAllRequest)(nil), "calendar.GetAllRequest")
-	proto.RegisterType((*AllEventResponse)(nil), "calendar.AllEventResponse")
+	proto.RegisterType((*GetAllResponse)(nil), "calendar.GetAllResponse")
 	proto.RegisterType((*AddRequest)(nil), "calendar.AddRequest")
 	proto.RegisterType((*EditRequest)(nil), "calendar.EditRequest")
 	proto.RegisterType((*RemoveRequst)(nil), "calendar.RemoveRequst")
-	proto.RegisterType((*OperationStatusResponse)(nil), "calendar.OperationStatusResponse")
+	proto.RegisterType((*AddResponse)(nil), "calendar.AddResponse")
+	proto.RegisterType((*EditResponse)(nil), "calendar.EditResponse")
+	proto.RegisterType((*RemoveResponse)(nil), "calendar.RemoveResponse")
 }
 
 func init() { proto.RegisterFile("calendar.proto", fileDescriptor_e3d25d49f056cdb2) }
 
 var fileDescriptor_e3d25d49f056cdb2 = []byte{
-	// 397 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x93, 0xcb, 0x4f, 0xea, 0x40,
-	0x14, 0xc6, 0xd3, 0x16, 0x7a, 0xb9, 0x87, 0xc7, 0xbd, 0x99, 0xdc, 0x0b, 0x4d, 0x37, 0x62, 0x8d,
-	0x91, 0x55, 0x89, 0x48, 0xd8, 0x18, 0x8d, 0x95, 0x90, 0xba, 0x33, 0xa9, 0xae, 0xdc, 0x15, 0xe6,
-	0x48, 0x9a, 0xf4, 0x65, 0x67, 0xca, 0x5f, 0xe9, 0x1f, 0x65, 0x98, 0xd2, 0x0e, 0xf8, 0x20, 0x98,
-	0xb8, 0xeb, 0xcc, 0x39, 0xf3, 0xfb, 0xbe, 0x73, 0xbe, 0x14, 0x3a, 0x0b, 0x3f, 0xc4, 0x98, 0xfa,
-	0x99, 0x9d, 0x66, 0x09, 0x4f, 0x48, 0xa3, 0x3c, 0x9b, 0x47, 0xcb, 0x24, 0x59, 0x86, 0x38, 0x14,
-	0xf7, 0xf3, 0xfc, 0x79, 0xc8, 0x83, 0x08, 0x19, 0xf7, 0xa3, 0xb4, 0x68, 0xb5, 0x10, 0xea, 0xb3,
-	0x15, 0xc6, 0x9c, 0x10, 0xa8, 0xe5, 0x79, 0x40, 0x0d, 0xa5, 0xaf, 0x0c, 0x7e, 0x7b, 0xe2, 0x9b,
-	0xd8, 0x50, 0xa3, 0x3e, 0x47, 0x43, 0xed, 0x2b, 0x83, 0xe6, 0xc8, 0xb4, 0x0b, 0x98, 0x5d, 0xc2,
-	0xec, 0xc7, 0x12, 0xe6, 0x89, 0x3e, 0x62, 0xc0, 0xaf, 0x08, 0x19, 0xf3, 0x97, 0x68, 0x68, 0x02,
-	0x53, 0x1e, 0xad, 0x31, 0x80, 0x8b, 0xdc, 0xc3, 0x97, 0x1c, 0x59, 0xa1, 0xc5, 0x30, 0xab, 0xb4,
-	0x18, 0x66, 0x95, 0xbe, 0x2a, 0xf5, 0xad, 0x09, 0xb4, 0x85, 0x39, 0x0f, 0x59, 0x9a, 0xc4, 0x0c,
-	0xc9, 0x29, 0xd4, 0x71, 0x7d, 0x21, 0x5e, 0x36, 0x47, 0x7f, 0xec, 0x6a, 0xf0, 0xa2, 0xaf, 0xa8,
-	0x5a, 0x27, 0xd0, 0x76, 0x91, 0x3b, 0x61, 0xb8, 0x47, 0xd0, 0xba, 0x84, 0xbf, 0x4e, 0x18, 0xee,
-	0xf2, 0xcf, 0x40, 0x17, 0x04, 0x66, 0x28, 0x7d, 0xed, 0x33, 0x81, 0x4d, 0xd9, 0x72, 0x01, 0x1c,
-	0x4a, 0xf7, 0xcd, 0x53, 0x59, 0x55, 0xf7, 0x5a, 0xbd, 0x83, 0xe6, 0x8c, 0x06, 0xfc, 0x07, 0x48,
-	0x13, 0x68, 0x79, 0x18, 0x25, 0x2b, 0x5c, 0xb3, 0xbe, 0xb1, 0xe4, 0x73, 0xe8, 0xdd, 0xa7, 0x98,
-	0xf9, 0x3c, 0x48, 0xe2, 0x07, 0xee, 0xf3, 0x9c, 0x55, 0xeb, 0xe8, 0x82, 0xce, 0xf2, 0x05, 0x32,
-	0x26, 0x20, 0x0d, 0x6f, 0x73, 0x1a, 0xbd, 0xaa, 0xd0, 0x99, 0x6e, 0x4c, 0x08, 0x0f, 0x8c, 0x8c,
-	0x41, 0x73, 0x91, 0x93, 0x7f, 0xd2, 0x9c, 0xcc, 0xdb, 0xec, 0xbd, 0xb7, 0x5c, 0x0a, 0x5c, 0x81,
-	0x5e, 0x04, 0x45, 0x7a, 0x3b, 0x0f, 0x65, 0x74, 0xa6, 0x29, 0x0b, 0x1f, 0xe2, 0xba, 0x06, 0xcd,
-	0xa1, 0x74, 0x5b, 0x54, 0x86, 0x62, 0x1e, 0xcb, 0xdb, 0xaf, 0xe6, 0xbb, 0x81, 0xda, 0x7a, 0xf9,
-	0xe4, 0xff, 0x96, 0x3f, 0x19, 0xc6, 0x21, 0x84, 0x29, 0xe8, 0xc5, 0xd2, 0x49, 0x57, 0x36, 0x6f,
-	0xc7, 0x70, 0x00, 0xe4, 0xb6, 0xf5, 0x04, 0x65, 0x4f, 0x3a, 0x9f, 0xeb, 0xe2, 0xf7, 0xba, 0x78,
-	0x0b, 0x00, 0x00, 0xff, 0xff, 0x1a, 0x4f, 0x8b, 0xa5, 0xd5, 0x03, 0x00, 0x00,
+	// 399 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xac, 0x53, 0xc1, 0x6e, 0x9b, 0x40,
+	0x10, 0x15, 0x60, 0x53, 0x77, 0x70, 0xa9, 0xb4, 0x6a, 0x5d, 0xc4, 0xa5, 0x16, 0x95, 0x1b, 0x9f,
+	0xb0, 0x44, 0x9c, 0x48, 0x49, 0x4e, 0x4e, 0x64, 0x91, 0x33, 0xca, 0x29, 0x37, 0xec, 0x9d, 0x58,
+	0x96, 0xc0, 0x10, 0x76, 0xf1, 0x37, 0xe5, 0x33, 0x23, 0x2f, 0x0b, 0xac, 0x9d, 0x88, 0x28, 0x52,
+	0x6e, 0xde, 0x99, 0x37, 0xef, 0xcd, 0x7b, 0x63, 0xc0, 0x5e, 0xc7, 0x09, 0xee, 0x68, 0x5c, 0xf8,
+	0x79, 0x91, 0xf1, 0x8c, 0x0c, 0xea, 0xb7, 0xfb, 0x77, 0x93, 0x65, 0x9b, 0x04, 0x67, 0xa2, 0xbe,
+	0x2a, 0x9f, 0x66, 0x7c, 0x9b, 0x22, 0xe3, 0x71, 0x9a, 0x57, 0x50, 0x0f, 0xa1, 0xbf, 0xdc, 0xe3,
+	0x8e, 0x13, 0x02, 0xbd, 0xb2, 0xdc, 0x52, 0x47, 0x1b, 0x6b, 0xd3, 0xef, 0x91, 0xf8, 0x4d, 0x7c,
+	0xe8, 0xd1, 0x98, 0xa3, 0xa3, 0x8f, 0xb5, 0xa9, 0x15, 0xb8, 0x7e, 0x45, 0xe6, 0xd7, 0x64, 0xfe,
+	0x43, 0x4d, 0x16, 0x09, 0x1c, 0x71, 0xe0, 0x5b, 0x8a, 0x8c, 0xc5, 0x1b, 0x74, 0x0c, 0x41, 0x53,
+	0x3f, 0xbd, 0x39, 0x40, 0x88, 0x3c, 0xc2, 0xe7, 0x12, 0x59, 0xa5, 0xc5, 0xb0, 0x68, 0xb4, 0x18,
+	0x16, 0x8d, 0xbe, 0xde, 0xea, 0x7b, 0x73, 0xb0, 0xc4, 0x14, 0xcb, 0xb3, 0x1d, 0x43, 0x32, 0x81,
+	0x3e, 0x1e, 0x76, 0x15, 0x73, 0x56, 0xf0, 0xd3, 0x6f, 0x6c, 0x0b, 0x0b, 0x51, 0xd5, 0xf5, 0xfe,
+	0xc1, 0x8f, 0x10, 0xf9, 0x22, 0x49, 0x3a, 0xe4, 0xbc, 0x2b, 0xb0, 0x6b, 0x90, 0x64, 0x3f, 0x03,
+	0x53, 0xcc, 0x33, 0x47, 0x1b, 0x1b, 0xef, 0xd1, 0xcb, 0xb6, 0x17, 0x02, 0x2c, 0x28, 0xed, 0xf2,
+	0xd2, 0x2c, 0xaa, 0x77, 0x2e, 0x7a, 0x0f, 0xd6, 0x92, 0x6e, 0xf9, 0x17, 0x30, 0x5d, 0xc2, 0x30,
+	0xc2, 0x34, 0xdb, 0xe3, 0x81, 0xeb, 0x13, 0x01, 0x4f, 0xc0, 0x12, 0x56, 0x64, 0x04, 0x23, 0x30,
+	0x59, 0xb9, 0x46, 0xc6, 0xc4, 0xe0, 0x20, 0x92, 0x2f, 0xef, 0x3f, 0x0c, 0xab, 0x45, 0x3f, 0xc0,
+	0x4d, 0xc1, 0xae, 0xd7, 0xe8, 0x46, 0x06, 0x2f, 0x3a, 0xd8, 0x77, 0xd2, 0x8a, 0x70, 0xc2, 0x48,
+	0x00, 0x46, 0x88, 0x9c, 0xfc, 0x6a, 0x2d, 0xb6, 0xff, 0x18, 0xf7, 0xf7, 0x49, 0x55, 0xd2, 0xdf,
+	0x80, 0x59, 0x5d, 0x91, 0xfc, 0x39, 0x02, 0xb4, 0xc7, 0x77, 0x9d, 0xb7, 0x0d, 0x39, 0x1c, 0x80,
+	0xb1, 0xa0, 0x54, 0x15, 0x6c, 0xcf, 0xaa, 0x0a, 0xaa, 0x09, 0x5d, 0x40, 0xef, 0x90, 0x04, 0x51,
+	0xda, 0xca, 0x09, 0xdd, 0xd1, 0x69, 0x59, 0x8e, 0x5d, 0x83, 0x59, 0x05, 0x43, 0x14, 0x84, 0x7a,
+	0x31, 0x75, 0xcd, 0xe3, 0x08, 0x6f, 0x87, 0x8f, 0x50, 0xb7, 0xf2, 0xd5, 0xca, 0x14, 0x1f, 0xdf,
+	0xf9, 0x6b, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd3, 0x44, 0x0b, 0xab, 0xf3, 0x03, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -479,11 +559,11 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type CalendarEventsClient interface {
-	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*EventResponse, error)
-	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*AllEventResponse, error)
-	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*OperationStatusResponse, error)
-	Edit(ctx context.Context, in *EditRequest, opts ...grpc.CallOption) (*OperationStatusResponse, error)
-	Remove(ctx context.Context, in *RemoveRequst, opts ...grpc.CallOption) (*OperationStatusResponse, error)
+	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
+	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
+	Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error)
+	Edit(ctx context.Context, in *EditRequest, opts ...grpc.CallOption) (*EditResponse, error)
+	Remove(ctx context.Context, in *RemoveRequst, opts ...grpc.CallOption) (*RemoveResponse, error)
 }
 
 type calendarEventsClient struct {
@@ -494,8 +574,8 @@ func NewCalendarEventsClient(cc *grpc.ClientConn) CalendarEventsClient {
 	return &calendarEventsClient{cc}
 }
 
-func (c *calendarEventsClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*EventResponse, error) {
-	out := new(EventResponse)
+func (c *calendarEventsClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+	out := new(GetResponse)
 	err := c.cc.Invoke(ctx, "/calendar.CalendarEvents/Get", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -503,8 +583,8 @@ func (c *calendarEventsClient) Get(ctx context.Context, in *GetRequest, opts ...
 	return out, nil
 }
 
-func (c *calendarEventsClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*AllEventResponse, error) {
-	out := new(AllEventResponse)
+func (c *calendarEventsClient) GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error) {
+	out := new(GetAllResponse)
 	err := c.cc.Invoke(ctx, "/calendar.CalendarEvents/GetAll", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -512,8 +592,8 @@ func (c *calendarEventsClient) GetAll(ctx context.Context, in *GetAllRequest, op
 	return out, nil
 }
 
-func (c *calendarEventsClient) Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*OperationStatusResponse, error) {
-	out := new(OperationStatusResponse)
+func (c *calendarEventsClient) Add(ctx context.Context, in *AddRequest, opts ...grpc.CallOption) (*AddResponse, error) {
+	out := new(AddResponse)
 	err := c.cc.Invoke(ctx, "/calendar.CalendarEvents/Add", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -521,8 +601,8 @@ func (c *calendarEventsClient) Add(ctx context.Context, in *AddRequest, opts ...
 	return out, nil
 }
 
-func (c *calendarEventsClient) Edit(ctx context.Context, in *EditRequest, opts ...grpc.CallOption) (*OperationStatusResponse, error) {
-	out := new(OperationStatusResponse)
+func (c *calendarEventsClient) Edit(ctx context.Context, in *EditRequest, opts ...grpc.CallOption) (*EditResponse, error) {
+	out := new(EditResponse)
 	err := c.cc.Invoke(ctx, "/calendar.CalendarEvents/Edit", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -530,8 +610,8 @@ func (c *calendarEventsClient) Edit(ctx context.Context, in *EditRequest, opts .
 	return out, nil
 }
 
-func (c *calendarEventsClient) Remove(ctx context.Context, in *RemoveRequst, opts ...grpc.CallOption) (*OperationStatusResponse, error) {
-	out := new(OperationStatusResponse)
+func (c *calendarEventsClient) Remove(ctx context.Context, in *RemoveRequst, opts ...grpc.CallOption) (*RemoveResponse, error) {
+	out := new(RemoveResponse)
 	err := c.cc.Invoke(ctx, "/calendar.CalendarEvents/Remove", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -541,30 +621,30 @@ func (c *calendarEventsClient) Remove(ctx context.Context, in *RemoveRequst, opt
 
 // CalendarEventsServer is the server API for CalendarEvents service.
 type CalendarEventsServer interface {
-	Get(context.Context, *GetRequest) (*EventResponse, error)
-	GetAll(context.Context, *GetAllRequest) (*AllEventResponse, error)
-	Add(context.Context, *AddRequest) (*OperationStatusResponse, error)
-	Edit(context.Context, *EditRequest) (*OperationStatusResponse, error)
-	Remove(context.Context, *RemoveRequst) (*OperationStatusResponse, error)
+	Get(context.Context, *GetRequest) (*GetResponse, error)
+	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
+	Add(context.Context, *AddRequest) (*AddResponse, error)
+	Edit(context.Context, *EditRequest) (*EditResponse, error)
+	Remove(context.Context, *RemoveRequst) (*RemoveResponse, error)
 }
 
 // UnimplementedCalendarEventsServer can be embedded to have forward compatible implementations.
 type UnimplementedCalendarEventsServer struct {
 }
 
-func (*UnimplementedCalendarEventsServer) Get(ctx context.Context, req *GetRequest) (*EventResponse, error) {
+func (*UnimplementedCalendarEventsServer) Get(ctx context.Context, req *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (*UnimplementedCalendarEventsServer) GetAll(ctx context.Context, req *GetAllRequest) (*AllEventResponse, error) {
+func (*UnimplementedCalendarEventsServer) GetAll(ctx context.Context, req *GetAllRequest) (*GetAllResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAll not implemented")
 }
-func (*UnimplementedCalendarEventsServer) Add(ctx context.Context, req *AddRequest) (*OperationStatusResponse, error) {
+func (*UnimplementedCalendarEventsServer) Add(ctx context.Context, req *AddRequest) (*AddResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Add not implemented")
 }
-func (*UnimplementedCalendarEventsServer) Edit(ctx context.Context, req *EditRequest) (*OperationStatusResponse, error) {
+func (*UnimplementedCalendarEventsServer) Edit(ctx context.Context, req *EditRequest) (*EditResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Edit not implemented")
 }
-func (*UnimplementedCalendarEventsServer) Remove(ctx context.Context, req *RemoveRequst) (*OperationStatusResponse, error) {
+func (*UnimplementedCalendarEventsServer) Remove(ctx context.Context, req *RemoveRequst) (*RemoveResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Remove not implemented")
 }
 
