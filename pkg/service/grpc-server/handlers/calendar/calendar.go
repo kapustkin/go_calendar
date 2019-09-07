@@ -7,7 +7,6 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	"github.com/kapustkin/go_calendar/pkg/models"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
@@ -52,7 +51,7 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
-	res := storage.AddEvent(user, models.Event{Date: date, UUID: uuid, Message: event.Message})
+	res := storage.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
 	return &calendarpb.AddResponse{Sucess: res}, nil
 }
 
@@ -69,7 +68,7 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
-	res := storage.EditEvent(user, models.Event{Date: date, UUID: uuid, Message: event.Message})
+	res := storage.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
 
 	return &calendarpb.EditResponse{Sucess: res}, nil
 }

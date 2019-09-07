@@ -2,15 +2,23 @@ package storage
 
 import (
 	"sync"
+	"time"
 
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_calendar/pkg/models"
 )
+
+// Event событие каледаря
+type Event struct {
+	UUID     uuid.UUID
+	Date     time.Time
+	Duration time.Time
+	Message  string
+}
 
 // Storage структура хранилища
 type Storage struct {
 	sync.RWMutex
-	data map[string]map[uuid.UUID]models.Event
+	data map[string]map[uuid.UUID]Event
 }
 
 var (
@@ -18,10 +26,10 @@ var (
 )
 
 // GetAllEvents return all user events
-func GetAllEvents(user string) []models.Event {
+func GetAllEvents(user string) []Event {
 	storage.RLock()
 	defer storage.RUnlock()
-	data := []models.Event{}
+	data := []Event{}
 	for _, value := range storage.data[user] {
 		data = append(data, value)
 	}
@@ -29,17 +37,17 @@ func GetAllEvents(user string) []models.Event {
 }
 
 // AddEvent element to storage
-func AddEvent(user string, event models.Event) bool {
+func AddEvent(user string, event Event) bool {
 	storage.Lock()
 	defer storage.Unlock()
 
 	userRec := storage.data[user]
 	if userRec == nil {
-		storage.data = make(map[string]map[uuid.UUID]models.Event)
+		storage.data = make(map[string]map[uuid.UUID]Event)
 	}
 
 	if _, ok := storage.data[user]; !ok {
-		storage.data[user] = map[uuid.UUID]models.Event{}
+		storage.data[user] = map[uuid.UUID]Event{}
 	}
 
 	if _, ok := storage.data[user][event.UUID]; !ok {
@@ -50,7 +58,7 @@ func AddEvent(user string, event models.Event) bool {
 }
 
 // EditEvent edit event
-func EditEvent(user string, event models.Event) bool {
+func EditEvent(user string, event Event) bool {
 	storage.Lock()
 	defer storage.Unlock()
 
