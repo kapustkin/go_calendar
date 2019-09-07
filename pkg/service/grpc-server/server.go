@@ -20,7 +20,7 @@ func Run(addres string) error {
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetCalendar())
+	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer())
 	err = grpcServer.Serve(lis)
 	return err
 }

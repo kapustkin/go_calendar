@@ -4,10 +4,7 @@ import (
 	"context"
 	"log"
 	"time"
-
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	"github.com/kapustkin/go_calendar/pkg/models"
-
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
@@ -22,8 +19,16 @@ func Init(address string) {
 	addr = address
 }
 
+// Event событие каледаря
+type Event struct {
+	UUID     uuid.UUID
+	Date     time.Time
+	Duration time.Time
+	Message  string
+}
+
 // GetAllEvents return all user events
-func GetAllEvents(user string) ([]models.Event, error) {
+func GetAllEvents(user string) ([]Event, error) {
 	cc, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
@@ -39,7 +44,7 @@ func GetAllEvents(user string) ([]models.Event, error) {
 		return nil, err
 	}
 
-	var result []models.Event
+	var result []Event
 	for _, v := range events.Events {
 		uuid, err := uuid.Parse(v.Uuid)
 		if err != nil {
@@ -49,13 +54,13 @@ func GetAllEvents(user string) ([]models.Event, error) {
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, models.Event{Date: date, UUID: uuid, Message: v.Message})
+		result = append(result, Event{Date: date, UUID: uuid, Message: v.Message})
 	}
 	return result, nil
 }
 
 // AddEvent element to storage
-func AddEvent(user string, event models.Event) (bool, error) {
+func AddEvent(user string, event Event) (bool, error) {
 	cc, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)
@@ -80,7 +85,7 @@ func AddEvent(user string, event models.Event) (bool, error) {
 }
 
 // EditEvent element to storage
-func EditEvent(user string, event models.Event) (bool, error) {
+func EditEvent(user string, event Event) (bool, error) {
 	cc, err := grpc.Dial(addr, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("could not connect: %v", err)

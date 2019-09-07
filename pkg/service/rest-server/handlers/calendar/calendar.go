@@ -8,7 +8,6 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
-	"github.com/kapustkin/go_calendar/pkg/models"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 )
 
@@ -37,7 +36,7 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
-	var data models.Event
+	var data dal.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		http.Error(res, errParsing, http.StatusForbidden)
@@ -47,7 +46,7 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 	}
 
-	event := models.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
+	event := dal.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
 
 	user := chi.URLParam(req, userFieldName)
 	result, err := dal.AddEvent(user, event)
@@ -66,7 +65,7 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
-	var event models.Event
+	var event dal.Event
 	err = json.Unmarshal(body, &event)
 	if err != nil {
 		http.Error(res, errParsing, http.StatusForbidden)
@@ -88,7 +87,7 @@ func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
-	var data models.Event
+	var data dal.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
 		http.Error(res, errParsing, http.StatusNotImplemented)

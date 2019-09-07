@@ -11,22 +11,22 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
-// CalendarServer grpc interface realization
-type CalendarServer struct {
+// EventServer grpc interface realization
+type EventServer struct {
 }
 
-// GetCalendar grpc interface realization
-func GetCalendar() *CalendarServer {
-	return &CalendarServer{}
+// GetEventServer grpc interface realization
+func GetEventServer() *EventServer {
+	return &EventServer{}
 }
 
 // Get not implemented
-func (c *CalendarServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*calendarpb.GetResponse, error) {
+func (c *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*calendarpb.GetResponse, error) {
 	return nil, fmt.Errorf("this method not implemented. Try later")
 }
 
 // GetAll возвращает все записи пользователя
-func (c *CalendarServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
+func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
 	events := storage.GetAllEvents(req.GetUser())
 	var grpcResponse []*calendarpb.Event
 	for _, v := range events {
@@ -40,7 +40,7 @@ func (c *CalendarServer) GetAll(ctx context.Context, req *calendarpb.GetAllReque
 }
 
 // Add добавляет новое событие
-func (c *CalendarServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*calendarpb.AddResponse, error) {
+func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*calendarpb.AddResponse, error) {
 	user := req.GetUser()
 	event := req.GetEvent()
 
@@ -57,7 +57,7 @@ func (c *CalendarServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*
 }
 
 // Edit редактирует событие
-func (c *CalendarServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*calendarpb.EditResponse, error) {
+func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*calendarpb.EditResponse, error) {
 	user := req.GetUser()
 	event := req.GetEvent()
 
@@ -75,7 +75,7 @@ func (c *CalendarServer) Edit(ctx context.Context, req *calendarpb.EditRequest) 
 }
 
 // Remove удаляет событие
-func (c *CalendarServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) (*calendarpb.RemoveResponse, error) {
+func (c *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) (*calendarpb.RemoveResponse, error) {
 	user := req.GetUser()
 	uuidString := req.GetUuid()
 
