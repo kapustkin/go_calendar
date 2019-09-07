@@ -7,7 +7,11 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	storage "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+)
+
+var (
+	db storage.Storage
 )
 
 // EventServer grpc interface realization
@@ -15,7 +19,8 @@ type EventServer struct {
 }
 
 // GetEventServer grpc interface realization
-func GetEventServer() *EventServer {
+func GetEventServer(store *storage.Storage) *EventServer {
+	db = *store
 	return &EventServer{}
 }
 
@@ -26,7 +31,10 @@ func (c *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*cal
 
 // GetAll возвращает все записи пользователя
 func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
-	events := storage.GetAllEvents(req.GetUser())
+	events, err := db.GetAllEvents(req.GetUser())
+	if err != nil {
+		return nil, err
+	}
 	var grpcResponse []*calendarpb.Event
 	for _, v := range events {
 		date, err := ptypes.TimestampProto(v.Date)
@@ -51,7 +59,7 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
-	res := storage.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	res := db.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
 	return &calendarpb.AddResponse{Sucess: res}, nil
 }
 
@@ -68,7 +76,7 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
-	res := storage.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	res := db.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
 
 	return &calendarpb.EditResponse{Sucess: res}, nil
 }
@@ -82,6 +90,6 @@ func (c *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) 
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}
-	res := storage.RemoveEvent(user, uuid)
+	res := db.RemoveEvent(user, uuid)
 	return &calendarpb.RemoveResponse{Sucess: res}, nil
 }
