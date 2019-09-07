@@ -21,11 +21,13 @@ func GetEvents(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
 	events, err := dal.GetAllEvents(user)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	data, err := json.Marshal(events)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	res.Write(data)
 }
@@ -43,7 +45,7 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 	}
 	uuid, err := uuid.NewUUID()
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}
 
 	event := dal.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
@@ -51,11 +53,12 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
 	result, err := dal.AddEvent(user, event)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if !result {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, "Add record failed", http.StatusInternalServerError)
 	}
 }
 
@@ -73,7 +76,8 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
 	result, err := dal.EditEvent(user, event)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if !result {
@@ -96,7 +100,8 @@ func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
 	result, err := dal.RemoveEvent(user, data.UUID)
 	if err != nil {
-		http.Error(res, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	if !result {

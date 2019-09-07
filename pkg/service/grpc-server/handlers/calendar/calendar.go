@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	storage "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -33,7 +34,7 @@ func (c *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*cal
 func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
 	events, err := db.GetAllEvents(req.GetUser())
 	if err != nil {
-		return nil, err
+		return nil, status.Error(666, err.Error())
 	}
 	var grpcResponse []*calendarpb.Event
 	for _, v := range events {
@@ -59,7 +60,10 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
-	res := db.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	res, err := db.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	if err != nil {
+		return &calendarpb.AddResponse{Sucess: false}, err
+	}
 	return &calendarpb.AddResponse{Sucess: res}, nil
 }
 
@@ -76,8 +80,10 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
-	res := db.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
-
+	res, err := db.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	if err != nil {
+		return &calendarpb.EditResponse{Sucess: false}, err
+	}
 	return &calendarpb.EditResponse{Sucess: res}, nil
 }
 
@@ -90,6 +96,9 @@ func (c *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) 
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}
-	res := db.RemoveEvent(user, uuid)
+	res, err := db.RemoveEvent(user, uuid)
+	if err != nil {
+		return &calendarpb.RemoveResponse{Sucess: false}, err
+	}
 	return &calendarpb.RemoveResponse{Sucess: res}, nil
 }

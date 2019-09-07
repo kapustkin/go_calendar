@@ -4,14 +4,14 @@ import (
 	"log"
 	"net"
 
-	"github.com/kapustkin/go_calendar/pkg/api/v1"
+	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/handlers/calendar"
 	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+
 	//db "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
 	db "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/postgre"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	
 )
 
 // Run запуск GRPC сервера
@@ -23,7 +23,8 @@ func Run(addres string) error {
 
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
-	var db s.Storage = db.DB {}
+	var db s.Storage = db.DB{}
+	db.Init("postgres://postgres:password@192.168.1.233/ms_calendar?sslmode=disable")
 	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer(&db))
 	err = grpcServer.Serve(lis)
 	return err

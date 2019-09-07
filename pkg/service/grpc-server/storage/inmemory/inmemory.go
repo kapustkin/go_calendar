@@ -20,6 +20,11 @@ var (
 	db database
 )
 
+// Init storage
+func (d DB) Init(params string) {
+	// no need init
+}
+
 // GetAllEvents return all user events
 func (d DB) GetAllEvents(user string) ([]s.Event, error) {
 	db.RLock()

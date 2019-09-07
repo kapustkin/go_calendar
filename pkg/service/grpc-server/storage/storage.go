@@ -8,10 +8,11 @@ import (
 
 // Storage interface
 type Storage interface {
+	Init(params string)
 	GetAllEvents(user string) ([]Event, error)
-	AddEvent(user string, event Event) bool
-	EditEvent(user string, event Event) bool
-	RemoveEvent(user string, uuid uuid.UUID) bool
+	AddEvent(user string, event Event) (bool, error)
+	EditEvent(user string, event Event) (bool, error)
+	RemoveEvent(user string, uuid uuid.UUID) (bool, error)
 }
 
 // Event событие каледаря

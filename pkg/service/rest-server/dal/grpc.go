@@ -2,12 +2,15 @@ package dal
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"time"
-	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
+
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
+	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/status"
 )
 
 var addr string
@@ -41,6 +44,10 @@ func GetAllEvents(user string) ([]Event, error) {
 
 	events, err := calendar.GetAll(ctx, &calendarpb.GetAllRequest{User: user})
 	if err != nil {
+		// gRPC error proc example
+		if status.Convert(err).Code() == 666 {
+			return nil, fmt.Errorf(status.Convert(err).Message())
+		}
 		return nil, err
 	}
 
