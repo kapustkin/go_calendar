@@ -6,7 +6,7 @@ import (
 
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/handlers/calendar"
-	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/config"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
@@ -17,21 +17,21 @@ import (
 
 // Run запуск GRPC сервера
 func Run() error {
-	c := config.InitConfig()
+	conf := config.InitConfig()
 
-	var db s.Storage
-	switch c.StorageType {
+	var db storage.Storage
+	switch conf.StorageType {
 	case 0:
 		db = inmemory.DB{}
-		db.Init(c.ConnectionString)
+		db.Init(conf.ConnectionString)
 	case 1:
 		db = postgre.DB{}
-		db.Init(c.ConnectionString)
+		db.Init(conf.ConnectionString)
 	default:
-		return fmt.Errorf("storage type %d not supported", c.StorageType)
+		return fmt.Errorf("storage type %d not supported", conf.StorageType)
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
 		return fmt.Errorf("grpc failed to listen %v", err)
 	}
