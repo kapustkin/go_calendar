@@ -3,29 +3,20 @@ package dal
 import (
 	"context"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	"google.golang.org/grpc"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal/calendar"
 	"google.golang.org/grpc/status"
-)
-
-var (
-	calendar calendarpb.CalendarEventsClient
 )
 
 const timeout = 1000
 
 // Init инициализация Data Access Layer
-func Init(address string) {
-	grpcConnection, err := grpc.Dial(address, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	calendar = calendarpb.NewCalendarEventsClient(grpcConnection)
+func Init(addr string) {
+	calendar.Init(addr)
 }
 
 // Event событие каледаря
@@ -38,10 +29,15 @@ type Event struct {
 
 // GetAllEvents return all user events
 func GetAllEvents(user string) ([]Event, error) {
+	calendarService, err := calendar.GetCalendarService()
+	if err != nil {
+		return nil, err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
-	events, err := calendar.GetAll(ctx, &calendarpb.GetAllRequest{User: user})
+	events, err := calendarService.GetAll(ctx, &calendarpb.GetAllRequest{User: user})
 	if err != nil {
 		// gRPC error proc example
 		if status.Convert(err).Code() == 666 {
@@ -67,6 +63,11 @@ func GetAllEvents(user string) ([]Event, error) {
 
 // AddEvent element to storage
 func AddEvent(user string, event Event) (bool, error) {
+	calendarService, err := calendar.GetCalendarService()
+	if err != nil {
+		return false, err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -75,7 +76,7 @@ func AddEvent(user string, event Event) (bool, error) {
 		return false, err
 	}
 
-	result, err := calendar.Add(ctx, &calendarpb.AddRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	result, err := calendarService.Add(ctx, &calendarpb.AddRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
 	if err != nil {
 		return false, err
 	}
@@ -85,6 +86,11 @@ func AddEvent(user string, event Event) (bool, error) {
 
 // EditEvent element to storage
 func EditEvent(user string, event Event) (bool, error) {
+	calendarService, err := calendar.GetCalendarService()
+	if err != nil {
+		return false, err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -93,7 +99,7 @@ func EditEvent(user string, event Event) (bool, error) {
 		return false, err
 	}
 
-	result, err := calendar.Edit(ctx, &calendarpb.EditRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	result, err := calendarService.Edit(ctx, &calendarpb.EditRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
 	if err != nil {
 		return false, err
 	}
@@ -103,10 +109,15 @@ func EditEvent(user string, event Event) (bool, error) {
 
 // RemoveEvent element to storage
 func RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
+	calendarService, err := calendar.GetCalendarService()
+	if err != nil {
+		return false, err
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
-	result, err := calendar.Remove(ctx, &calendarpb.RemoveRequst{User: user, Uuid: uuid.String()})
+	result, err := calendarService.Remove(ctx, &calendarpb.RemoveRequst{User: user, Uuid: uuid.String()})
 	if err != nil {
 		return false, err
 	}
