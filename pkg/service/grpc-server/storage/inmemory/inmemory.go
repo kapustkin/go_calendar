@@ -14,7 +14,7 @@ type DB struct {
 
 type database struct {
 	sync.RWMutex
-	data map[string]map[uuid.UUID]s.Event
+	data map[int32]map[uuid.UUID]s.Event
 }
 
 var (
@@ -27,46 +27,46 @@ func (d DB) Init(params string) {
 }
 
 // GetAllEvents return all user events
-func (d DB) GetAllEvents(user string) ([]s.Event, error) {
+func (d DB) GetAllEvents(UserID int32) ([]s.Event, error) {
 	db.RLock()
 	defer db.RUnlock()
 	data := []s.Event{}
-	for _, value := range db.data[user] {
+	for _, value := range db.data[UserID] {
 		data = append(data, value)
 	}
 	return data, nil
 }
 
 // AddEvent element to storage
-func (d DB) AddEvent(user string, event s.Event) (bool, error) {
+func (d DB) AddEvent(event *s.Event) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
-	userRec := db.data[user]
+	userRec := db.data[event.UserID]
 	if userRec == nil {
-		db.data = make(map[string]map[uuid.UUID]s.Event)
+		db.data = make(map[int32]map[uuid.UUID]s.Event)
 	}
 
-	if _, ok := db.data[user]; !ok {
-		db.data[user] = map[uuid.UUID]s.Event{}
+	if _, ok := db.data[event.UserID]; !ok {
+		db.data[event.UserID] = map[uuid.UUID]s.Event{}
 	}
 
-	if _, ok := db.data[user][event.UUID]; !ok {
-		db.data[user][event.UUID] = event
+	if _, ok := db.data[event.UserID][event.UUID]; !ok {
+		db.data[event.UserID][event.UUID] = *event
 		return true, nil
 	}
 	return false, fmt.Errorf("fail adding record %s", event.UUID)
 }
 
 // EditEvent edit event
-func (d DB) EditEvent(user string, event s.Event) (bool, error) {
+func (d DB) EditEvent(event *s.Event) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
-	if _, ok := db.data[user][event.UUID]; ok {
-		rec := db.data[user][event.UUID]
+	if _, ok := db.data[event.UserID][event.UUID]; ok {
+		rec := db.data[event.UserID][event.UUID]
 		rec.Message = event.Message
-		db.data[user][event.UUID] = rec
+		db.data[event.UserID][event.UUID] = rec
 		return true, nil
 	}
 
@@ -74,12 +74,12 @@ func (d DB) EditEvent(user string, event s.Event) (bool, error) {
 }
 
 // RemoveEvent remove event
-func (d DB) RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
+func (d DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
-	if _, ok := db.data[user][uuid]; ok {
-		delete(db.data[user], uuid)
+	if _, ok := db.data[userID][uuid]; ok {
+		delete(db.data[userID], uuid)
 		return true, nil
 	}
 

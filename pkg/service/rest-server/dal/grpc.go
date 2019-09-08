@@ -3,12 +3,13 @@ package dal
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal/calendar"
+	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal/pool"
 	"google.golang.org/grpc/status"
 )
 
@@ -16,7 +17,7 @@ const timeout = 1000
 
 // Init инициализация Data Access Layer
 func Init(addr string) {
-	calendar.Init(addr)
+	pool.Init(addr)
 }
 
 // Event событие каледаря
@@ -28,8 +29,8 @@ type Event struct {
 }
 
 // GetAllEvents return all user events
-func GetAllEvents(user string) ([]Event, error) {
-	calendarService, err := calendar.GetCalendarService()
+func GetAllEvents(UserID string) ([]Event, error) {
+	userid, err := strconv.ParseInt(UserID, 10, 32)
 	if err != nil {
 		return nil, err
 	}
@@ -37,7 +38,13 @@ func GetAllEvents(user string) ([]Event, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
-	events, err := calendarService.GetAll(ctx, &calendarpb.GetAllRequest{User: user})
+	conn, err := pool.GetConnectionFromPool(&ctx)
+	defer conn.Close()
+	if err != nil {
+		return nil, err
+	}
+
+	events, err := calendarpb.NewCalendarEventsClient(conn.ClientConn).GetAll(ctx, &calendarpb.GetAllRequest{UserId: int32(userid)})
 	if err != nil {
 		// gRPC error proc example
 		if status.Convert(err).Code() == 666 {
@@ -62,21 +69,26 @@ func GetAllEvents(user string) ([]Event, error) {
 }
 
 // AddEvent element to storage
-func AddEvent(user string, event Event) (bool, error) {
-	calendarService, err := calendar.GetCalendarService()
+func AddEvent(UserID string, event Event) (bool, error) {
+	userid, err := strconv.ParseInt(UserID, 10, 32)
 	if err != nil {
 		return false, err
 	}
-
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
+
+	conn, err := pool.GetConnectionFromPool(&ctx)
+	defer conn.Close()
+	if err != nil {
+		return false, err
+	}
 
 	date, err := ptypes.TimestampProto(event.Date)
 	if err != nil {
 		return false, err
 	}
 
-	result, err := calendarService.Add(ctx, &calendarpb.AddRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	result, err := calendarpb.NewCalendarEventsClient(conn.ClientConn).Add(ctx, &calendarpb.AddRequest{Event: &calendarpb.Event{UserId: int32(userid), Date: date, Uuid: event.UUID.String(), Message: event.Message}})
 	if err != nil {
 		return false, err
 	}
@@ -85,8 +97,8 @@ func AddEvent(user string, event Event) (bool, error) {
 }
 
 // EditEvent element to storage
-func EditEvent(user string, event Event) (bool, error) {
-	calendarService, err := calendar.GetCalendarService()
+func EditEvent(UserID string, event Event) (bool, error) {
+	userid, err := strconv.ParseInt(UserID, 10, 32)
 	if err != nil {
 		return false, err
 	}
@@ -94,12 +106,25 @@ func EditEvent(user string, event Event) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
+	conn, err := pool.GetConnectionFromPool(&ctx)
+	defer conn.Close()
+	if err != nil {
+		return false, err
+	}
+
 	date, err := ptypes.TimestampProto(event.Date)
 	if err != nil {
 		return false, err
 	}
 
-	result, err := calendarService.Edit(ctx, &calendarpb.EditRequest{User: user, Event: &calendarpb.Event{Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	result, err := calendarpb.NewCalendarEventsClient(conn.ClientConn).
+		Edit(ctx, &calendarpb.EditRequest{
+			Event: &calendarpb.Event{
+				UserId:  int32(userid),
+				Date:    date,
+				Uuid:    event.UUID.String(),
+				Message: event.Message,
+			}})
 	if err != nil {
 		return false, err
 	}
@@ -108,16 +133,21 @@ func EditEvent(user string, event Event) (bool, error) {
 }
 
 // RemoveEvent element to storage
-func RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
-	calendarService, err := calendar.GetCalendarService()
+func RemoveEvent(UserID string, uuid uuid.UUID) (bool, error) {
+	userid, err := strconv.ParseInt(UserID, 10, 32)
+	if err != nil {
+		return false, err
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	defer cancel()
+
+	conn, err := pool.GetConnectionFromPool(&ctx)
+	defer conn.Close()
 	if err != nil {
 		return false, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
-	defer cancel()
-
-	result, err := calendarService.Remove(ctx, &calendarpb.RemoveRequst{User: user, Uuid: uuid.String()})
+	result, err := calendarpb.NewCalendarEventsClient(conn.ClientConn).Remove(ctx, &calendarpb.RemoveRequst{UserId: int32(userid), Uuid: uuid.String()})
 	if err != nil {
 		return false, err
 	}

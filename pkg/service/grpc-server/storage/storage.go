@@ -9,14 +9,15 @@ import (
 // Storage interface
 type Storage interface {
 	Init(params string)
-	GetAllEvents(user string) ([]Event, error)
-	AddEvent(user string, event Event) (bool, error)
-	EditEvent(user string, event Event) (bool, error)
-	RemoveEvent(user string, uuid uuid.UUID) (bool, error)
+	GetAllEvents(UserID int32) ([]Event, error)
+	AddEvent(event *Event) (bool, error)
+	EditEvent(event *Event) (bool, error)
+	RemoveEvent(UserID int32, uuid uuid.UUID) (bool, error)
 }
 
 // Event событие каледаря
 type Event struct {
+	UserID   int32
 	UUID     uuid.UUID
 	Date     time.Time
 	Duration time.Time

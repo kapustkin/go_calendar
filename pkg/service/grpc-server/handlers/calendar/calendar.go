@@ -32,7 +32,7 @@ func (c *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*cal
 
 // GetAll возвращает все записи пользователя
 func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
-	events, err := db.GetAllEvents(req.GetUser())
+	events, err := db.GetAllEvents(req.GetUserId())
 	if err != nil {
 		return nil, status.Error(666, err.Error())
 	}
@@ -49,7 +49,6 @@ func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest)
 
 // Add добавляет новое событие
 func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*calendarpb.AddResponse, error) {
-	user := req.GetUser()
 	event := req.GetEvent()
 
 	uuid, err := uuid.Parse(event.GetUuid())
@@ -60,7 +59,7 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
-	res, err := db.AddEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	res, err := db.AddEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
@@ -69,7 +68,6 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 
 // Edit редактирует событие
 func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*calendarpb.EditResponse, error) {
-	user := req.GetUser()
 	event := req.GetEvent()
 
 	uuid, err := uuid.Parse(event.GetUuid())
@@ -80,7 +78,7 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
-	res, err := db.EditEvent(user, storage.Event{Date: date, UUID: uuid, Message: event.Message})
+	res, err := db.EditEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
@@ -89,14 +87,13 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 
 // Remove удаляет событие
 func (c *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) (*calendarpb.RemoveResponse, error) {
-	user := req.GetUser()
-	uuidString := req.GetUuid()
 
-	uuid, err := uuid.Parse(uuidString)
+	uuid, err := uuid.Parse(req.GetUuid())
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}
-	res, err := db.RemoveEvent(user, uuid)
+
+	res, err := db.RemoveEvent(req.GetUserId(), uuid)
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}
