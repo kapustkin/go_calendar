@@ -61,10 +61,10 @@ func (d DB) Init(conn string) {
 		tx := db.MustBegin()
 		err = tx.Commit()
 		if err != nil {
-			fmt.Printf("Init DB complete \n")
+			fmt.Printf("error DB init \n")
 			return
 		}
-		fmt.Printf("New DB init complete \n")
+		fmt.Printf("new DB init complete \n")
 	*/
 }
 
@@ -146,7 +146,32 @@ func (d DB) EditEvent(user string, event s.Event) (bool, error) {
 
 // RemoveEvent remove event
 func (d DB) RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
-	return false, fmt.Errorf("Not implemented")
+	db, err := sqlx.Connect("postgres", connString)
+	if err != nil {
+		return false, err
+	}
+	currentUser := userTable{}
+	err = db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
+	if err != nil {
+		return false, err
+	}
+
+	val, err := db.NamedExec(`DELETE FROM events WHERE user_id = :user_id AND uuid = :uuid`,
+		map[string]interface{}{
+			"user_id": currentUser.ID,
+			"uuid":    uuid.String(),
+		})
+
+	c, err := val.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	if c == 0 {
+		return false, fmt.Errorf("record with uuid %s not found", uuid)
+	}
+
+	return true, nil
 }
 
 func mapEvent(input *[]eventTable) ([]s.Event, error) {
