@@ -13,13 +13,19 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var addr string
+var (
+	calendar calendarpb.CalendarEventsClient
+)
 
 const timeout = 1000
 
 // Init инициализация Data Access Layer
 func Init(address string) {
-	addr = address
+	grpcConnection, err := grpc.Dial(address, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalf("could not connect: %v", err)
+	}
+	calendar = calendarpb.NewCalendarEventsClient(grpcConnection)
 }
 
 // Event событие каледаря
@@ -32,13 +38,6 @@ type Event struct {
 
 // GetAllEvents return all user events
 func GetAllEvents(user string) ([]Event, error) {
-	cc, err := grpc.Dial(addr, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	defer cc.Close()
-
-	calendar := calendarpb.NewCalendarEventsClient(cc)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -68,13 +67,6 @@ func GetAllEvents(user string) ([]Event, error) {
 
 // AddEvent element to storage
 func AddEvent(user string, event Event) (bool, error) {
-	cc, err := grpc.Dial(addr, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	defer cc.Close()
-
-	calendar := calendarpb.NewCalendarEventsClient(cc)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -93,13 +85,6 @@ func AddEvent(user string, event Event) (bool, error) {
 
 // EditEvent element to storage
 func EditEvent(user string, event Event) (bool, error) {
-	cc, err := grpc.Dial(addr, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	defer cc.Close()
-
-	calendar := calendarpb.NewCalendarEventsClient(cc)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -118,13 +103,6 @@ func EditEvent(user string, event Event) (bool, error) {
 
 // RemoveEvent element to storage
 func RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
-	cc, err := grpc.Dial(addr, grpc.WithInsecure())
-	if err != nil {
-		log.Fatalf("could not connect: %v", err)
-	}
-	defer cc.Close()
-
-	calendar := calendarpb.NewCalendarEventsClient(cc)
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
