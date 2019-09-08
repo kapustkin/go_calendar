@@ -1,30 +1,44 @@
 package grpc
 
 import (
-	"log"
+	"fmt"
 	"net"
 
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/handlers/calendar"
 	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 
-	//db "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
-	db "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/postgre"
+	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/config"
+	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
+	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/postgre"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
 // Run запуск GRPC сервера
-func Run(addres string) error {
-	lis, err := net.Listen("tcp", addres)
+func Run() error {
+	c := config.InitConfig()
+
+	var db s.Storage
+	switch c.StorageType {
+	case 0:
+		db = inmemory.DB{}
+		db.Init(c.ConnectionString)
+	case 1:
+		db = postgre.DB{}
+		db.Init(c.ConnectionString)
+	default:
+		return fmt.Errorf("storage type %d not supported", c.StorageType)
+	}
+
+	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", c.Host, c.Port))
 	if err != nil {
-		log.Fatalf("failed to listen %v", err)
+		return fmt.Errorf("grpc failed to listen %v", err)
 	}
 
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
-	var db s.Storage = db.DB{}
-	db.Init("postgres://postgres:password@192.168.1.233/ms_calendar?sslmode=disable")
+
 	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer(&db))
 	err = grpcServer.Serve(lis)
 	return err

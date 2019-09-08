@@ -95,8 +95,6 @@ func (d DB) AddEvent(user string, event s.Event) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	fmt.Printf("%v", currentUser)
-
 	_, err = db.NamedExec(`INSERT INTO events (user_id, uuid,start,finish,comment) VALUES (:user_id,:uuid,:start,:finish,:comment)`,
 		map[string]interface{}{
 			"user_id": currentUser.ID,

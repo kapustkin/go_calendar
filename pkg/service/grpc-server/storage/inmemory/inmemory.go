@@ -1,6 +1,7 @@
 package inmemory
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/google/uuid"
@@ -37,7 +38,7 @@ func (d DB) GetAllEvents(user string) ([]s.Event, error) {
 }
 
 // AddEvent element to storage
-func (d DB) AddEvent(user string, event s.Event) bool {
+func (d DB) AddEvent(user string, event s.Event) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -52,13 +53,13 @@ func (d DB) AddEvent(user string, event s.Event) bool {
 
 	if _, ok := db.data[user][event.UUID]; !ok {
 		db.data[user][event.UUID] = event
-		return true
+		return true, nil
 	}
-	return false
+	return false, fmt.Errorf("fail adding record %s", event.UUID)
 }
 
 // EditEvent edit event
-func (d DB) EditEvent(user string, event s.Event) bool {
+func (d DB) EditEvent(user string, event s.Event) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
@@ -66,21 +67,21 @@ func (d DB) EditEvent(user string, event s.Event) bool {
 		rec := db.data[user][event.UUID]
 		rec.Message = event.Message
 		db.data[user][event.UUID] = rec
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, fmt.Errorf("record %s not found", event.UUID)
 }
 
 // RemoveEvent remove event
-func (d DB) RemoveEvent(user string, uuid uuid.UUID) bool {
+func (d DB) RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
 	db.Lock()
 	defer db.Unlock()
 
 	if _, ok := db.data[user][uuid]; ok {
 		delete(db.data[user], uuid)
-		return true
+		return true, nil
 	}
 
-	return false
+	return false, fmt.Errorf("record %s not found", uuid)
 }
