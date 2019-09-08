@@ -12,7 +12,6 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/postgre"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 )
 
 // Run запуск GRPC сервера
@@ -30,8 +29,6 @@ func Run() error {
 	}
 
 	grpcServer := grpc.NewServer()
-	reflection.Register(grpcServer)
-
 	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer(db))
 	err = grpcServer.Serve(lis)
 	return err
