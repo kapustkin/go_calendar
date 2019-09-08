@@ -15,7 +15,7 @@ import (
 
 var addr string
 
-const timeout = 400
+const timeout = 1000
 
 // Init инициализация Data Access Layer
 func Init(address string) {
