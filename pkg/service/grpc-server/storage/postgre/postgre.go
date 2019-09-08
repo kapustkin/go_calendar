@@ -18,21 +18,6 @@ var (
 	db *sqlx.DB
 )
 
-var schema = `
-CREATE TABLE users (
-	id SERIAL PRIMARY KEY,
-	name text
-);
-
-CREATE TABLE events (
-	id SERIAL PRIMARY KEY, 
-	user_id int,
-	uuid text,
-	start timestamp,
-	finish timestamp,
-    comment text NULL
-)`
-
 type userTable struct {
 	ID   int    `db:"id"`
 	Name string `db:"name"`
@@ -55,18 +40,7 @@ func (d DB) Init(conn string) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-
 	db = connection
-	/*
-		db.MustExec(schema)
-		tx := db.MustBegin()
-		err = tx.Commit()
-		if err != nil {
-			fmt.Printf("error DB init \n")
-			return
-		}
-		fmt.Printf("new DB init complete \n")
-	*/
 }
 
 // GetAllEvents return all user events
