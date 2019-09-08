@@ -14,7 +14,9 @@ import (
 	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
-var connString string
+var (
+	db *sqlx.DB
+)
 
 var schema = `
 CREATE TABLE users (
@@ -49,13 +51,12 @@ type DB struct {
 
 // Init storage
 func (d DB) Init(conn string) {
-	connString = conn
-
-	_, err := sqlx.Connect("postgres", connString)
+	connection, err := sqlx.Connect("postgres", conn)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
+	db = connection
 	/*
 		db.MustExec(schema)
 		tx := db.MustBegin()
@@ -70,13 +71,8 @@ func (d DB) Init(conn string) {
 
 // GetAllEvents return all user events
 func (d DB) GetAllEvents(user string) ([]s.Event, error) {
-	db, err := sqlx.Connect("postgres", connString)
-	if err != nil {
-		return nil, err
-	}
-
 	events := []eventTable{}
-	err = db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=(SELECT id FROM users WHERE name=$1)`, user)
+	err := db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=(SELECT id FROM users WHERE name=$1)`, user)
 	res, err := mapEvent(&events)
 	if err != nil {
 		return nil, err
@@ -86,12 +82,8 @@ func (d DB) GetAllEvents(user string) ([]s.Event, error) {
 
 // AddEvent element to storage
 func (d DB) AddEvent(user string, event s.Event) (bool, error) {
-	db, err := sqlx.Connect("postgres", connString)
-	if err != nil {
-		return false, err
-	}
 	currentUser := userTable{}
-	err = db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
+	err := db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
 	if err != nil {
 		return false, err
 	}
@@ -113,12 +105,8 @@ func (d DB) AddEvent(user string, event s.Event) (bool, error) {
 
 // EditEvent edit event
 func (d DB) EditEvent(user string, event s.Event) (bool, error) {
-	db, err := sqlx.Connect("postgres", connString)
-	if err != nil {
-		return false, err
-	}
 	currentUser := userTable{}
-	err = db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
+	err := db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
 	if err != nil {
 		return false, err
 	}
@@ -146,12 +134,8 @@ func (d DB) EditEvent(user string, event s.Event) (bool, error) {
 
 // RemoveEvent remove event
 func (d DB) RemoveEvent(user string, uuid uuid.UUID) (bool, error) {
-	db, err := sqlx.Connect("postgres", connString)
-	if err != nil {
-		return false, err
-	}
 	currentUser := userTable{}
-	err = db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
+	err := db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
 	if err != nil {
 		return false, err
 	}
