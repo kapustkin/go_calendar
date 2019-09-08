@@ -113,7 +113,35 @@ func (d DB) AddEvent(user string, event s.Event) (bool, error) {
 
 // EditEvent edit event
 func (d DB) EditEvent(user string, event s.Event) (bool, error) {
-	return false, fmt.Errorf("Not implemented")
+	db, err := sqlx.Connect("postgres", connString)
+	if err != nil {
+		return false, err
+	}
+	currentUser := userTable{}
+	err = db.Get(&currentUser, `SELECT * FROM users WHERE name=$1 LIMIT 1`, user)
+	if err != nil {
+		return false, err
+	}
+
+	val, err := db.NamedExec(`UPDATE events SET (start,finish,comment) = (:start,:finish,:comment) WHERE user_id = :user_id AND uuid = :uuid`,
+		map[string]interface{}{
+			"user_id": currentUser.ID,
+			"uuid":    event.UUID.String(),
+			"start":   event.Date,
+			"finish":  event.Date,
+			"comment": event.Message,
+		})
+
+	c, err := val.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	if c == 0 {
+		return false, fmt.Errorf("record with uuid %s not found", event.UUID)
+	}
+
+	return true, nil
 }
 
 // RemoveEvent remove event
