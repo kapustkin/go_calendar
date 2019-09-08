@@ -19,16 +19,9 @@ import (
 func Run() error {
 	conf := config.InitConfig()
 
-	var db storage.Storage
-	switch conf.StorageType {
-	case 0:
-		db = inmemory.DB{}
-		db.Init(conf.ConnectionString)
-	case 1:
-		db = postgre.DB{}
-		db.Init(conf.ConnectionString)
-	default:
-		return fmt.Errorf("storage type %d not supported", conf.StorageType)
+	db, err := getStorage(conf.StorageType, conf.ConnectionString)
+	if err != nil {
+		return err
 	}
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
@@ -39,7 +32,23 @@ func Run() error {
 	grpcServer := grpc.NewServer()
 	reflection.Register(grpcServer)
 
-	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer(&db))
+	calendarpb.RegisterCalendarEventsServer(grpcServer, calendar.GetEventServer(db))
 	err = grpcServer.Serve(lis)
 	return err
+}
+
+func getStorage(storageType int, connectionString string) (*storage.Storage, error) {
+	var db storage.Storage
+	switch storageType {
+	case 0:
+		db = inmemory.DB{}
+		db.Init(connectionString)
+	case 1:
+		db = postgre.DB{}
+		db.Init(connectionString)
+	default:
+		return nil, fmt.Errorf("storage type %d not supported", storageType)
+	}
+
+	return &db, nil
 }
