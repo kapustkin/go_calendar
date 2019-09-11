@@ -10,6 +10,7 @@ import (
 
 // DB структура хранилища
 type DB struct {
+	db *database
 }
 
 type database struct {
@@ -17,56 +18,54 @@ type database struct {
 	data map[int32]map[uuid.UUID]s.Event
 }
 
-var (
-	db database
-)
 
 // Init storage
-func (d DB) Init(params string) {
-	// no need init
+func Init() *DB {
+	storage := make(map[int32]map[uuid.UUID]s.Event)
+	return &DB{ db: &database{data: storage}}
 }
 
 // GetAllEvents return all user events
-func (d DB) GetAllEvents(UserID int32) ([]s.Event, error) {
-	db.RLock()
-	defer db.RUnlock()
+func (d *DB) GetAllEvents(UserID int32) ([]s.Event, error) {
+	d.db.RLock()
+	defer d.db.RUnlock()
 	data := []s.Event{}
-	for _, value := range db.data[UserID] {
+	for _, value := range d.db.data[UserID] {
 		data = append(data, value)
 	}
 	return data, nil
 }
 
 // AddEvent element to storage
-func (d DB) AddEvent(event *s.Event) (bool, error) {
-	db.Lock()
-	defer db.Unlock()
+func (d *DB) AddEvent(event *s.Event) (bool, error) {
+	d.db.Lock()
+	defer d.db.Unlock()
 
-	userRec := db.data[event.UserID]
+	userRec := d.db.data[event.UserID]
 	if userRec == nil {
-		db.data = make(map[int32]map[uuid.UUID]s.Event)
+		d.db.data = make(map[int32]map[uuid.UUID]s.Event)
 	}
 
-	if _, ok := db.data[event.UserID]; !ok {
-		db.data[event.UserID] = map[uuid.UUID]s.Event{}
+	if _, ok := d.db.data[event.UserID]; !ok {
+		d.db.data[event.UserID] = map[uuid.UUID]s.Event{}
 	}
 
-	if _, ok := db.data[event.UserID][event.UUID]; !ok {
-		db.data[event.UserID][event.UUID] = *event
+	if _, ok := d.db.data[event.UserID][event.UUID]; !ok {
+		d.db.data[event.UserID][event.UUID] = *event
 		return true, nil
 	}
 	return false, fmt.Errorf("fail adding record %s", event.UUID)
 }
 
 // EditEvent edit event
-func (d DB) EditEvent(event *s.Event) (bool, error) {
-	db.Lock()
-	defer db.Unlock()
+func (d *DB) EditEvent(event *s.Event) (bool, error) {
+	d.db.Lock()
+	defer d.db.Unlock()
 
-	if _, ok := db.data[event.UserID][event.UUID]; ok {
-		rec := db.data[event.UserID][event.UUID]
+	if _, ok := d.db.data[event.UserID][event.UUID]; ok {
+		rec := d.db.data[event.UserID][event.UUID]
 		rec.Message = event.Message
-		db.data[event.UserID][event.UUID] = rec
+		d.db.data[event.UserID][event.UUID] = rec
 		return true, nil
 	}
 
@@ -74,12 +73,12 @@ func (d DB) EditEvent(event *s.Event) (bool, error) {
 }
 
 // RemoveEvent remove event
-func (d DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
-	db.Lock()
-	defer db.Unlock()
+func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
+	d.db.Lock()
+	defer d.db.Unlock()
 
-	if _, ok := db.data[userID][uuid]; ok {
-		delete(db.data[userID], uuid)
+	if _, ok := d.db.data[userID][uuid]; ok {
+		delete(d.db.data[userID], uuid)
 		return true, nil
 	}
 

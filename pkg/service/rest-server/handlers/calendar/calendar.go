@@ -16,10 +16,19 @@ const errReadBody string = "Error read body"
 const errParsing string = "Error parsing payload"
 const errNotFound string = "Event not found"
 
+type EventHandler struct {
+	dal *dal.GrpcDal
+}
+
+// Init calendar event handler
+func Init(d *dal.GrpcDal) *EventHandler {
+	return &EventHandler{dal: d}
+}
+
 // GetEvents all events for user
-func GetEvents(res http.ResponseWriter, req *http.Request) {
+func (e *EventHandler) GetEvents(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
-	events, err := dal.GetAllEvents(user)
+	events, err := e.dal.GetAllEvents(user)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
@@ -33,7 +42,7 @@ func GetEvents(res http.ResponseWriter, req *http.Request) {
 }
 
 // AddEvent for user
-func AddEvent(res http.ResponseWriter, req *http.Request) {
+func (e *EventHandler) AddEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
@@ -51,7 +60,7 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 	event := dal.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
 
 	user := chi.URLParam(req, userFieldName)
-	result, err := dal.AddEvent(user, event)
+	result, err := e.dal.AddEvent(user, event)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
@@ -63,7 +72,7 @@ func AddEvent(res http.ResponseWriter, req *http.Request) {
 }
 
 // EditEvent for user
-func EditEvent(res http.ResponseWriter, req *http.Request) {
+func (e *EventHandler) EditEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
@@ -74,7 +83,7 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, errParsing, http.StatusForbidden)
 	}
 	user := chi.URLParam(req, userFieldName)
-	result, err := dal.EditEvent(user, event)
+	result, err := e.dal.EditEvent(user, event)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
@@ -86,7 +95,7 @@ func EditEvent(res http.ResponseWriter, req *http.Request) {
 }
 
 // RemoveEvent for user
-func RemoveEvent(res http.ResponseWriter, req *http.Request) {
+func (e *EventHandler) RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
 		http.Error(res, errReadBody, http.StatusForbidden)
@@ -98,7 +107,7 @@ func RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	}
 
 	user := chi.URLParam(req, userFieldName)
-	result, err := dal.RemoveEvent(user, data.UUID)
+	result, err := e.dal.RemoveEvent(user, data.UUID)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return

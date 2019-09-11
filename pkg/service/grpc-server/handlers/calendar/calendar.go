@@ -11,28 +11,24 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-var (
-	db storage.Storage
-)
-
 // EventServer grpc interface realization
 type EventServer struct {
+	db storage.Storage
 }
 
 // GetEventServer grpc interface realization
 func GetEventServer(store *storage.Storage) *EventServer {
-	db = *store
-	return &EventServer{}
+	return &EventServer{db: *store}
 }
 
 // Get not implemented
-func (c *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*calendarpb.GetResponse, error) {
+func (eventServer *EventServer) Get(ctx context.Context, req *calendarpb.GetRequest) (*calendarpb.GetResponse, error) {
 	return nil, fmt.Errorf("this method not implemented. Try later")
 }
 
 // GetAll возвращает все записи пользователя
-func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
-	events, err := db.GetAllEvents(req.GetUserId())
+func (eventServer *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest) (*calendarpb.GetAllResponse, error) {
+	events, err := eventServer.db.GetAllEvents(req.GetUserId())
 	if err != nil {
 		return nil, status.Error(666, err.Error())
 	}
@@ -48,7 +44,7 @@ func (c *EventServer) GetAll(ctx context.Context, req *calendarpb.GetAllRequest)
 }
 
 // Add добавляет новое событие
-func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*calendarpb.AddResponse, error) {
+func (eventServer *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*calendarpb.AddResponse, error) {
 	event := req.GetEvent()
 
 	uuid, err := uuid.Parse(event.GetUuid())
@@ -59,7 +55,7 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
-	res, err := db.AddEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
+	res, err := eventServer.db.AddEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
 	if err != nil {
 		return &calendarpb.AddResponse{Sucess: false}, err
 	}
@@ -67,7 +63,7 @@ func (c *EventServer) Add(ctx context.Context, req *calendarpb.AddRequest) (*cal
 }
 
 // Edit редактирует событие
-func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*calendarpb.EditResponse, error) {
+func (eventServer *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*calendarpb.EditResponse, error) {
 	event := req.GetEvent()
 
 	uuid, err := uuid.Parse(event.GetUuid())
@@ -78,7 +74,7 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
-	res, err := db.EditEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
+	res, err := eventServer.db.EditEvent(&storage.Event{UserID: event.GetUserId(), Date: date, UUID: uuid, Message: event.Message})
 	if err != nil {
 		return &calendarpb.EditResponse{Sucess: false}, err
 	}
@@ -86,14 +82,14 @@ func (c *EventServer) Edit(ctx context.Context, req *calendarpb.EditRequest) (*c
 }
 
 // Remove удаляет событие
-func (c *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) (*calendarpb.RemoveResponse, error) {
+func (eventServer *EventServer) Remove(ctx context.Context, req *calendarpb.RemoveRequst) (*calendarpb.RemoveResponse, error) {
 
 	uuid, err := uuid.Parse(req.GetUuid())
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}
 
-	res, err := db.RemoveEvent(req.GetUserId(), uuid)
+	res, err := eventServer.db.RemoveEvent(req.GetUserId(), uuid)
 	if err != nil {
 		return &calendarpb.RemoveResponse{Sucess: false}, err
 	}

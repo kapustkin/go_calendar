@@ -18,8 +18,8 @@ import (
 // Run основной обработчик
 func Run(args []string) error {
 	c := config.InitConfig()
-	// Data Access Layer инициализация
-	dal.Init(c.GRPC)
+	// Data Access Layer init
+	grpcDal := dal.Init(c.GRPC)
 
 	r := chi.NewRouter()
 	// Middleware
@@ -42,12 +42,14 @@ func Run(args []string) error {
 		log.Printf("Warning! Starting without logging... \n")
 	}
 
+	calendarService := calendar.Init(grpcDal)
+
 	// Routes
 	r.Route("/calendar", func(r chi.Router) {
-		r.Get("/{user}", calendar.GetEvents)
-		r.Post("/{user}/add", calendar.AddEvent)
-		r.Post("/{user}/edit", calendar.EditEvent)
-		r.Post("/{user}/remove", calendar.RemoveEvent)
+		r.Get("/{user}", calendarService.GetEvents)
+		r.Post("/{user}/add", calendarService.AddEvent)
+		r.Post("/{user}/edit", calendarService.EditEvent)
+		r.Post("/{user}/remove", calendarService.RemoveEvent)
 	})
 
 	return http.ListenAndServe(fmt.Sprintf("%s:%v", c.Host, c.Port), r)

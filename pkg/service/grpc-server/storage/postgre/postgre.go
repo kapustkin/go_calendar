@@ -3,7 +3,6 @@ package postgre
 import (
 	"database/sql"
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -12,10 +11,6 @@ import (
 
 	"github.com/google/uuid"
 	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
-)
-
-var (
-	db *sqlx.DB
 )
 
 type userTable struct {
@@ -32,21 +27,19 @@ type eventTable struct {
 
 // DB структура хранилища
 type DB struct {
+	db *sqlx.DB
 }
 
 // Init storage
-func (d DB) Init(conn string) {
-	connection, err := sqlx.Connect("postgres", conn)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	db = connection
+func Init(conn string) *DB {
+	connection, _ := sqlx.Connect("postgres", conn)
+	return &DB{ db: connection}
 }
 
 // GetAllEvents return all user events
-func (d DB) GetAllEvents(UserID int32) ([]s.Event, error) {
+func (d *DB) GetAllEvents(UserID int32) ([]s.Event, error) {
 	events := []eventTable{}
-	err := db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=$1`, UserID)
+	err := d.db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=$1`, UserID)
 	res, err := mapEvent(&events)
 	if err != nil {
 		return nil, err
@@ -55,8 +48,8 @@ func (d DB) GetAllEvents(UserID int32) ([]s.Event, error) {
 }
 
 // AddEvent element to storage
-func (d DB) AddEvent(event *s.Event) (bool, error) {
-	_, err := db.NamedExec(`INSERT INTO events (user_id, uuid,start,finish,comment) VALUES (:user_id,:uuid,:start,:finish,:comment)`,
+func (d *DB) AddEvent(event *s.Event) (bool, error) {
+	_, err := d.db.NamedExec(`INSERT INTO events (user_id, uuid,start,finish,comment) VALUES (:user_id,:uuid,:start,:finish,:comment)`,
 		map[string]interface{}{
 			"user_id": event.UserID,
 			"uuid":    event.UUID.String(),
@@ -71,9 +64,9 @@ func (d DB) AddEvent(event *s.Event) (bool, error) {
 }
 
 // EditEvent edit event
-func (d DB) EditEvent(event *s.Event) (bool, error) {
+func (d *DB) EditEvent(event *s.Event) (bool, error) {
 
-	val, err := db.NamedExec(`UPDATE events SET (start,finish,comment) = (:start,:finish,:comment) WHERE user_id = :user_id AND uuid = :uuid`,
+	val, err := d.db.NamedExec(`UPDATE events SET (start,finish,comment) = (:start,:finish,:comment) WHERE user_id = :user_id AND uuid = :uuid`,
 		map[string]interface{}{
 			"user_id": event.UserID,
 			"uuid":    event.UUID.String(),
@@ -95,9 +88,9 @@ func (d DB) EditEvent(event *s.Event) (bool, error) {
 }
 
 // RemoveEvent remove event
-func (d DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
+func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 
-	val, err := db.NamedExec(`DELETE FROM events WHERE user_id = :user_id AND uuid = :uuid`,
+	val, err := d.db.NamedExec(`DELETE FROM events WHERE user_id = :user_id AND uuid = :uuid`,
 		map[string]interface{}{
 			"user_id": userID,
 			"uuid":    uuid.String(),

@@ -2,6 +2,7 @@ package grpc
 
 import (
 	"fmt"
+	"log"
 	"net"
 
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
@@ -18,10 +19,7 @@ import (
 func Run() error {
 	conf := config.InitConfig()
 
-	db, err := getStorage(conf.StorageType, conf.ConnectionString)
-	if err != nil {
-		return err
-	}
+	db := getStorage(conf.StorageType, conf.ConnectionString)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
@@ -34,18 +32,18 @@ func Run() error {
 	return err
 }
 
-func getStorage(storageType int, connectionString string) (*storage.Storage, error) {
-	var db storage.Storage
+func getStorage(storageType int, connectionString string) *storage.Storage {
 	switch storageType {
 	case 0:
-		db = inmemory.DB{}
-		db.Init(connectionString)
+		var db storage.Storage
+		db = inmemory.Init()
+		return &db
 	case 1:
-		db = postgre.DB{}
-		db.Init(connectionString)
+		var db storage.Storage
+		db = postgre.Init(connectionString)
+		return &db
 	default:
-		return nil, fmt.Errorf("storage type %d not supported", storageType)
+		log.Panicf("storage type %d not supported", storageType)
 	}
-
-	return &db, nil
+	return nil
 }
