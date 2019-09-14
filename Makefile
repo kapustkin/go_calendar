@@ -13,4 +13,6 @@ lint:
 	$(shell go env GOPATH)/bin/golangci-lint run --enable-all
 
 build:
-	go build -o bin/mc_calendar
+	protoc -I=api/proto/calendarpb/ --go_out=plugins=grpc:pkg/api/v1/ api/proto/calendarpb/calendar.proto	
+	go build -o=bin/grpc-server ./cmd/grpc-server/
+	go build -o=bin/rest-server ./cmd/rest-server/

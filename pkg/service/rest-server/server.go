@@ -19,6 +19,7 @@ import (
 func Run(args []string) error {
 	c := config.InitConfig()
 	// Data Access Layer init
+
 	grpcDal := dal.Init(c.GRPC)
 
 	r := chi.NewRouter()

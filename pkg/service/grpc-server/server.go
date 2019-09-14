@@ -23,7 +23,7 @@ func Run() error {
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
 	if err != nil {
-		return fmt.Errorf("grpc failed to listen %v", err)
+		return err
 	}
 
 	grpcServer := grpc.NewServer()

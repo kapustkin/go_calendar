@@ -52,13 +52,13 @@ message RemoveRequst {
 }
 
 message AddResponse {
-    bool sucess = 1;
+    bool success = 1;
 }
 
 message EditResponse {
-    bool sucess = 1;
+    bool success = 1;
 }
 
 message RemoveResponse {
-    bool sucess = 1;
+    bool success = 1;
 }

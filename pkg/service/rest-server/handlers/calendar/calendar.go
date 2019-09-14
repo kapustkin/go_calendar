@@ -14,7 +14,6 @@ import (
 const userFieldName string = "user"
 const errReadBody string = "Error read body"
 const errParsing string = "Error parsing payload"
-const errNotFound string = "Event not found"
 
 type EventHandler struct {
 	dal *dal.GrpcDal
@@ -38,7 +37,11 @@ func (e *EventHandler) GetEvents(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	res.Write(data)
+	_, err = res.Write(data)
+	if err != nil {
+		http.Error(res, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }
 
 // AddEvent for user

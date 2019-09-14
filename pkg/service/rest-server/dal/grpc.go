@@ -34,8 +34,8 @@ type Event struct {
 }
 
 // GetAllEvents return all user events
-func (g *GrpcDal) GetAllEvents(UserID string) ([]Event, error) {
-	userid, err := strconv.ParseInt(UserID, 10, 32)
+func (g *GrpcDal) GetAllEvents(userID string) ([]Event, error) {
+	userid, err := strconv.ParseInt(userID, 10, 32)
 	if err != nil {
 		return nil, err
 	}
@@ -43,7 +43,8 @@ func (g *GrpcDal) GetAllEvents(UserID string) ([]Event, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
-	events, err := calendarpb.NewCalendarEventsClient(g.connection).GetAll(ctx, &calendarpb.GetAllRequest{UserId: int32(userid)})
+	events, err := calendarpb.NewCalendarEventsClient(g.connection).GetAll(ctx,
+		&calendarpb.GetAllRequest{UserId: int32(userid)})
 	if err != nil {
 		// gRPC error proc example
 		if status.Convert(err).Code() == 666 {
@@ -52,7 +53,7 @@ func (g *GrpcDal) GetAllEvents(UserID string) ([]Event, error) {
 		return nil, err
 	}
 
-	var result []Event
+	result := make([]Event, len(events.Events))
 	for _, v := range events.Events {
 		uuid, err := uuid.Parse(v.Uuid)
 		if err != nil {
@@ -68,8 +69,8 @@ func (g *GrpcDal) GetAllEvents(UserID string) ([]Event, error) {
 }
 
 // AddEvent element to storage
-func (g *GrpcDal) AddEvent(UserID string, event Event) (bool, error) {
-	userid, err := strconv.ParseInt(UserID, 10, 32)
+func (g *GrpcDal) AddEvent(userID string, event Event) (bool, error) {
+	userid, err := strconv.ParseInt(userID, 10, 32)
 	if err != nil {
 		return false, err
 	}
@@ -81,17 +82,22 @@ func (g *GrpcDal) AddEvent(UserID string, event Event) (bool, error) {
 		return false, err
 	}
 
-	result, err := calendarpb.NewCalendarEventsClient(g.connection).Add(ctx, &calendarpb.AddRequest{Event: &calendarpb.Event{UserId: int32(userid), Date: date, Uuid: event.UUID.String(), Message: event.Message}})
+	result, err := calendarpb.NewCalendarEventsClient(g.connection).Add(ctx,
+		&calendarpb.AddRequest{Event: &calendarpb.Event{
+			UserId:  int32(userid),
+			Date:    date,
+			Uuid:    event.UUID.String(),
+			Message: event.Message}})
 	if err != nil {
 		return false, err
 	}
 
-	return result.Sucess, nil
+	return result.Success, nil
 }
 
 // EditEvent element to storage
-func (g *GrpcDal) EditEvent(UserID string, event Event) (bool, error) {
-	userid, err := strconv.ParseInt(UserID, 10, 32)
+func (g *GrpcDal) EditEvent(userID string, event Event) (bool, error) {
+	userid, err := strconv.ParseInt(userID, 10, 32)
 	if err != nil {
 		return false, err
 	}
@@ -116,22 +122,25 @@ func (g *GrpcDal) EditEvent(UserID string, event Event) (bool, error) {
 		return false, err
 	}
 
-	return result.Sucess, nil
+	return result.Success, nil
 }
 
 // RemoveEvent element to storage
-func (g *GrpcDal) RemoveEvent(UserID string, uuid uuid.UUID) (bool, error) {
-	userid, err := strconv.ParseInt(UserID, 10, 32)
+func (g *GrpcDal) RemoveEvent(userID string, uuid fmt.Stringer) (bool, error) {
+	userid, err := strconv.ParseInt(userID, 10, 32)
 	if err != nil {
 		return false, err
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
-	result, err := calendarpb.NewCalendarEventsClient(g.connection).Remove(ctx, &calendarpb.RemoveRequst{UserId: int32(userid), Uuid: uuid.String()})
+	result, err := calendarpb.NewCalendarEventsClient(g.connection).Remove(ctx,
+		&calendarpb.RemoveRequst{
+			UserId: int32(userid),
+			Uuid:   uuid.String()})
 	if err != nil {
 		return false, err
 	}
 
-	return result.Sucess, nil
+	return result.Success, nil
 }

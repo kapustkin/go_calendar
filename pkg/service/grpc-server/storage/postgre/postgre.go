@@ -13,11 +13,6 @@ import (
 	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
-type userTable struct {
-	ID   int    `db:"id"`
-	Name string `db:"name"`
-}
-
 type eventTable struct {
 	UUID    string         `db:"uuid"`
 	Start   time.Time      `db:"start"`
@@ -33,13 +28,16 @@ type DB struct {
 // Init storage
 func Init(conn string) *DB {
 	connection, _ := sqlx.Connect("postgres", conn)
-	return &DB{ db: connection}
+	return &DB{db: connection}
 }
 
 // GetAllEvents return all user events
-func (d *DB) GetAllEvents(UserID int32) ([]s.Event, error) {
+func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
 	events := []eventTable{}
-	err := d.db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=$1`, UserID)
+	err := d.db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=$1`, userID)
+	if err != nil {
+		return nil, err
+	}
 	res, err := mapEvent(&events)
 	if err != nil {
 		return nil, err
@@ -49,7 +47,10 @@ func (d *DB) GetAllEvents(UserID int32) ([]s.Event, error) {
 
 // AddEvent element to storage
 func (d *DB) AddEvent(event *s.Event) (bool, error) {
-	_, err := d.db.NamedExec(`INSERT INTO events (user_id, uuid,start,finish,comment) VALUES (:user_id,:uuid,:start,:finish,:comment)`,
+	_, err := d.db.NamedExec(`
+	INSERT INTO events 
+	(user_id, uuid,start,finish,comment) VALUES 
+	(:user_id,:uuid,:start,:finish,:comment)`,
 		map[string]interface{}{
 			"user_id": event.UserID,
 			"uuid":    event.UUID.String(),
@@ -66,7 +67,11 @@ func (d *DB) AddEvent(event *s.Event) (bool, error) {
 // EditEvent edit event
 func (d *DB) EditEvent(event *s.Event) (bool, error) {
 
-	val, err := d.db.NamedExec(`UPDATE events SET (start,finish,comment) = (:start,:finish,:comment) WHERE user_id = :user_id AND uuid = :uuid`,
+	val, err := d.db.NamedExec(`
+	UPDATE events SET 
+	(start,finish,comment) = 
+	(:start,:finish,:comment) 
+	WHERE user_id = :user_id AND uuid = :uuid`,
 		map[string]interface{}{
 			"user_id": event.UserID,
 			"uuid":    event.UUID.String(),
@@ -74,6 +79,9 @@ func (d *DB) EditEvent(event *s.Event) (bool, error) {
 			"finish":  event.Date,
 			"comment": event.Message,
 		})
+	if err != nil {
+		return false, err
+	}
 
 	c, err := val.RowsAffected()
 	if err != nil {
@@ -95,7 +103,9 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 			"user_id": userID,
 			"uuid":    uuid.String(),
 		})
-
+	if err != nil {
+		return false, err
+	}
 	c, err := val.RowsAffected()
 	if err != nil {
 		return false, err

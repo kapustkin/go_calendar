@@ -3,3 +3,9 @@ protoc --proto_path=api/proto/v1 --proto_path=scripts --go_out=plugins=grpc:pkg/
 
 cd D:\Documents\kapustkin\protoc\bin\
 .\protoc -I=d:\Documents\kapustkin\go_calendar\api\proto\calendarpb\ --go_out=plugins=grpc:d:\Documents\kapustkin\go_calendar\api\proto\calendarpb\ calendar.proto
+
+
+# ubuntu
+
+ apt-get install golang-goprotobuf-dev
+ protoc -I=api/proto/calendarpb/ --go_out=plugins=grpc:pkg/api/v1/ api/proto/calendarpb/calendar.proto

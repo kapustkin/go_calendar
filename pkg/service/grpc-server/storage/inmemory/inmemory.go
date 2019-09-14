@@ -18,19 +18,18 @@ type database struct {
 	data map[int32]map[uuid.UUID]s.Event
 }
 
-
 // Init storage
 func Init() *DB {
 	storage := make(map[int32]map[uuid.UUID]s.Event)
-	return &DB{ db: &database{data: storage}}
+	return &DB{db: &database{data: storage}}
 }
 
 // GetAllEvents return all user events
-func (d *DB) GetAllEvents(UserID int32) ([]s.Event, error) {
+func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
 	d.db.RLock()
 	defer d.db.RUnlock()
 	data := []s.Event{}
-	for _, value := range d.db.data[UserID] {
+	for _, value := range d.db.data[userID] {
 		data = append(data, value)
 	}
 	return data, nil
