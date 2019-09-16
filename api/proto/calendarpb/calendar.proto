@@ -12,13 +12,18 @@ service CalendarEvents {
     rpc Add(AddRequest) returns (AddResponse);
     rpc Edit(EditRequest) returns (EditResponse);
     rpc Remove(RemoveRequst) returns (RemoveResponse);
+
+    rpc GetEventsForSend(GetEventsForNotifyRequest) returns (GetEventsForNotifyResponse);
+    rpc SetEventAsSended(SetEventAsSendedRequest) returns (SetEventAsSendedResponse);
 }
 
 message Event {
     int32  userId = 1;
     string uuid = 2;
-    google.protobuf.Timestamp date = 3;
+    google.protobuf.Timestamp createDate = 3;
     string message = 4;
+    google.protobuf.Timestamp eventDate = 5;
+    bool isSended = 6;
 }
 
 message GetRequest {
@@ -60,5 +65,21 @@ message EditResponse {
 }
 
 message RemoveResponse {
+    bool success = 1;
+}
+
+message GetEventsForNotifyRequest {
+}
+
+message GetEventsForNotifyResponse {
+    repeated Event events = 1;
+}
+
+message SetEventAsSendedRequest {
+    int32  userId = 1;
+    string uuid = 2;
+}
+
+message SetEventAsSendedResponse {
     bool success = 1;
 }

@@ -3,6 +3,7 @@ package calendar
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
@@ -34,11 +35,20 @@ func (eventServer *EventServer) GetAll(ctx context.Context, req *pb.GetAllReques
 	}
 	grpcResponse := make([]*pb.Event, len(events))
 	for _, v := range events {
-		date, err := ptypes.TimestampProto(v.Date)
+		evDate, err := ptypes.TimestampProto(v.EventDate)
 		if err != nil {
 			return nil, err
 		}
-		grpcResponse = append(grpcResponse, &pb.Event{Uuid: v.UUID.String(), Message: v.Message, Date: date})
+		crDate, err := ptypes.TimestampProto(v.CreateDate)
+		if err != nil {
+			return nil, err
+		}
+
+		grpcResponse = append(grpcResponse, &pb.Event{
+			Uuid:       v.UUID.String(),
+			Message:    v.Message,
+			CreateDate: crDate,
+			EventDate:  evDate})
 	}
 	return &pb.GetAllResponse{Events: grpcResponse}, nil
 }
@@ -51,14 +61,17 @@ func (eventServer *EventServer) Add(ctx context.Context, req *pb.AddRequest) (*p
 	if err != nil {
 		return &pb.AddResponse{Success: false}, err
 	}
-	date, err := ptypes.Timestamp(event.GetDate())
+	createDate, err := ptypes.Timestamp(event.GetCreateDate())
 	if err != nil {
 		return &pb.AddResponse{Success: false}, err
 	}
 	res, err := eventServer.db.AddEvent(&storage.Event{
-		UserID: event.GetUserId(),
-		Date:   date, UUID: uuid,
-		Message: event.Message})
+		UserID:     event.GetUserId(),
+		CreateDate: time.Now(),
+		EventDate:  createDate,
+		UUID:       uuid,
+		Message:    event.Message,
+		IsSended:   false})
 	if err != nil {
 		return &pb.AddResponse{Success: false}, err
 	}
@@ -73,15 +86,17 @@ func (eventServer *EventServer) Edit(ctx context.Context, req *pb.EditRequest) (
 	if err != nil {
 		return &pb.EditResponse{Success: false}, err
 	}
-	date, err := ptypes.Timestamp(event.GetDate())
+	evDate, err := ptypes.Timestamp(event.GetEventDate())
 	if err != nil {
 		return &pb.EditResponse{Success: false}, err
 	}
 	res, err := eventServer.db.EditEvent(
 		&storage.Event{
-			UserID: event.GetUserId(),
-			Date:   date, UUID: uuid,
-			Message: event.Message})
+			UUID:      uuid,
+			UserID:    event.GetUserId(),
+			EventDate: evDate,
+			Message:   event.Message,
+			IsSended:  event.IsSended})
 	if err != nil {
 		return &pb.EditResponse{Success: false}, err
 	}
@@ -101,4 +116,14 @@ func (eventServer *EventServer) Remove(ctx context.Context, req *pb.RemoveRequst
 		return &pb.RemoveResponse{Success: false}, err
 	}
 	return &pb.RemoveResponse{Success: res}, nil
+}
+
+// GetEventsForSend получает события для рассылки
+func (eventServer *EventServer) GetEventsForSend(ctx context.Context, req *pb.GetEventsForNotifyRequest) (*pb.GetEventsForNotifyResponse, error) {
+	return nil, fmt.Errorf("Not implemented")
+}
+
+// SetEventAsSended отмечает событие как отправленное
+func (eventServer *EventServer) SetEventAsSended(ctx context.Context, req *pb.SetEventAsSendedRequest) (*pb.SetEventAsSendedResponse, error) {
+	return nil, fmt.Errorf("Not implemented")
 }

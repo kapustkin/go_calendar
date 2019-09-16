@@ -10,14 +10,15 @@ import (
 	_ "github.com/lib/pq"
 
 	"github.com/google/uuid"
-	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	storage "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
 type eventTable struct {
-	UUID    string         `db:"uuid"`
-	Start   time.Time      `db:"start"`
-	Finish  time.Time      `db:"finish"`
-	Comment sql.NullString `db:"comment"`
+	Create    time.Time      `db:"eventcreate"`
+	UUID      string         `db:"uuid"`
+	Comment   sql.NullString `db:"comment"`
+	EventDate time.Time      `db:"eventdate"`
+	IsSended  bool           `db:"issended"`
 }
 
 // DB структура хранилища
@@ -32,9 +33,9 @@ func Init(conn string) *DB {
 }
 
 // GetAllEvents return all user events
-func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
+func (d *DB) GetAllEvents(userID int32) ([]storage.Event, error) {
 	events := []eventTable{}
-	err := d.db.Select(&events, `SELECT uuid,start,finish,comment FROM events WHERE user_id=$1`, userID)
+	err := d.db.Select(&events, `SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE user_id=$1`, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -46,17 +47,18 @@ func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
 }
 
 // AddEvent element to storage
-func (d *DB) AddEvent(event *s.Event) (bool, error) {
+func (d *DB) AddEvent(event *storage.Event) (bool, error) {
 	_, err := d.db.NamedExec(`
 	INSERT INTO events 
-	(user_id, uuid,start,finish,comment) VALUES 
-	(:user_id,:uuid,:start,:finish,:comment)`,
+	(user_id, uuid,eventcreate,eventdate,comment,issended) VALUES 
+	(:user_id,:uuid,:eventcreate,:eventdate,:comment,:issended)`,
 		map[string]interface{}{
-			"user_id": event.UserID,
-			"uuid":    event.UUID.String(),
-			"start":   event.Date,
-			"finish":  event.Date,
-			"comment": event.Message,
+			"user_id":     event.UserID,
+			"uuid":        event.UUID.String(),
+			"eventcreate": event.CreateDate,
+			"eventdate":   event.EventDate,
+			"comment":     event.Message,
+			"issended":    event.IsSended,
 		})
 	if err != nil {
 		return false, err
@@ -65,19 +67,19 @@ func (d *DB) AddEvent(event *s.Event) (bool, error) {
 }
 
 // EditEvent edit event
-func (d *DB) EditEvent(event *s.Event) (bool, error) {
+func (d *DB) EditEvent(event *storage.Event) (bool, error) {
 
 	val, err := d.db.NamedExec(`
 	UPDATE events SET 
-	(start,finish,comment) = 
-	(:start,:finish,:comment) 
+	(eventdate,comment,issended) = 
+	(:eventdate,:comment,:issended) 
 	WHERE user_id = :user_id AND uuid = :uuid`,
 		map[string]interface{}{
-			"user_id": event.UserID,
-			"uuid":    event.UUID.String(),
-			"start":   event.Date,
-			"finish":  event.Date,
-			"comment": event.Message,
+			"user_id":   event.UserID,
+			"uuid":      event.UUID.String(),
+			"eventdate": event.EventDate,
+			"comment":   event.Message,
+			"issended":  event.IsSended,
 		})
 	if err != nil {
 		return false, err
@@ -118,17 +120,27 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 	return true, nil
 }
 
-func mapEvent(input *[]eventTable) ([]s.Event, error) {
-	result := []s.Event{}
+func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
+	return nil, fmt.Errorf("Not implemented")
+}
+
+func (d *DB) SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error) {
+	return false, fmt.Errorf("Not implemented")
+}
+
+func mapEvent(input *[]eventTable) ([]storage.Event, error) {
+	result := []storage.Event{}
 	for _, r := range *input {
 		uuid, err := uuid.Parse(r.UUID)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, s.Event{
-			UUID:    uuid,
-			Date:    r.Start,
-			Message: r.Comment.String,
+		result = append(result, storage.Event{
+			UUID:       uuid,
+			CreateDate: r.Create,
+			EventDate:  r.EventDate,
+			Message:    r.Comment.String,
+			IsSended:   r.IsSended,
 		})
 	}
 	return result, nil

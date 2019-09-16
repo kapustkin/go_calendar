@@ -22,6 +22,7 @@ require (
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/processout/grpc-go-pool v1.2.1
+	github.com/segmentio/kafka-go v0.3.3
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
 	github.com/spf13/cobra v0.0.5 // indirect

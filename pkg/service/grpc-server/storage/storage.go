@@ -11,14 +11,18 @@ type Storage interface {
 	GetAllEvents(UserID int32) ([]Event, error)
 	AddEvent(event *Event) (bool, error)
 	EditEvent(event *Event) (bool, error)
-	RemoveEvent(UserID int32, uuid uuid.UUID) (bool, error)
+	RemoveEvent(userID int32, uuid uuid.UUID) (bool, error)
+
+	GetEventsForSend(daysBeforeEvent int32) ([]Event, error)
+	SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error)
 }
 
 // Event событие каледаря
 type Event struct {
-	UserID   int32
-	UUID     uuid.UUID
-	Date     time.Time
-	Duration time.Time
-	Message  string
+	CreateDate time.Time
+	UUID       uuid.UUID
+	UserID     int32
+	EventDate  time.Time
+	Message    string
+	IsSended   bool
 }

@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/google/uuid"
-	s "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	storage "github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
 )
 
 // DB структура хранилища
@@ -15,20 +15,20 @@ type DB struct {
 
 type database struct {
 	sync.RWMutex
-	data map[int32]map[uuid.UUID]s.Event
+	data map[int32]map[uuid.UUID]storage.Event
 }
 
 // Init storage
 func Init() *DB {
-	storage := make(map[int32]map[uuid.UUID]s.Event)
+	storage := make(map[int32]map[uuid.UUID]storage.Event)
 	return &DB{db: &database{data: storage}}
 }
 
 // GetAllEvents return all user events
-func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
+func (d *DB) GetAllEvents(userID int32) ([]storage.Event, error) {
 	d.db.RLock()
 	defer d.db.RUnlock()
-	data := []s.Event{}
+	data := []storage.Event{}
 	for _, value := range d.db.data[userID] {
 		data = append(data, value)
 	}
@@ -36,17 +36,17 @@ func (d *DB) GetAllEvents(userID int32) ([]s.Event, error) {
 }
 
 // AddEvent element to storage
-func (d *DB) AddEvent(event *s.Event) (bool, error) {
+func (d *DB) AddEvent(event *storage.Event) (bool, error) {
 	d.db.Lock()
 	defer d.db.Unlock()
 
 	userRec := d.db.data[event.UserID]
 	if userRec == nil {
-		d.db.data = make(map[int32]map[uuid.UUID]s.Event)
+		d.db.data = make(map[int32]map[uuid.UUID]storage.Event)
 	}
 
 	if _, ok := d.db.data[event.UserID]; !ok {
-		d.db.data[event.UserID] = map[uuid.UUID]s.Event{}
+		d.db.data[event.UserID] = map[uuid.UUID]storage.Event{}
 	}
 
 	if _, ok := d.db.data[event.UserID][event.UUID]; !ok {
@@ -57,7 +57,7 @@ func (d *DB) AddEvent(event *s.Event) (bool, error) {
 }
 
 // EditEvent edit event
-func (d *DB) EditEvent(event *s.Event) (bool, error) {
+func (d *DB) EditEvent(event *storage.Event) (bool, error) {
 	d.db.Lock()
 	defer d.db.Unlock()
 
@@ -82,4 +82,11 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 	}
 
 	return false, fmt.Errorf("record %s not found", uuid)
+}
+
+func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
+	return nil, fmt.Errorf("Not implemented")
+}
+func (d *DB) SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error) {
+	return false, fmt.Errorf("Not implemented")
 }
