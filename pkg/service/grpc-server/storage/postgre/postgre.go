@@ -121,27 +121,62 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 }
 
 func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
-	return nil, fmt.Errorf("Not implemented")
+	events := []eventTable{}
+	err := d.db.Select(&events,
+		`SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE eventdate > current_date + interval '%i' day`,
+		daysBeforeEvent)
+	if err != nil {
+		return nil, err
+	}
+	res, err := mapEvent(&events)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 func (d *DB) SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error) {
-	return false, fmt.Errorf("Not implemented")
+	val, err := d.db.NamedExec(`
+	UPDATE events SET 
+	(issended) = (:issended) 
+	WHERE user_id = :user_id AND uuid = :uuid`,
+		map[string]interface{}{
+			"user_id":  userID,
+			"uuid":     uuid.String(),
+			"issended": true,
+		})
+	if err != nil {
+		return false, err
+	}
+
+	c, err := val.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+
+	if c == 0 {
+		return false, fmt.Errorf("record with uuid %s not found", uuid)
+	}
+
+	return true, nil
 }
 
 func mapEvent(input *[]eventTable) ([]storage.Event, error) {
-	result := []storage.Event{}
-	for _, r := range *input {
+	var result = make([]storage.Event, len(*input))
+	for i, r := range *input {
 		uuid, err := uuid.Parse(r.UUID)
 		if err != nil {
 			return nil, err
 		}
-		result = append(result, storage.Event{
+		result[i] = storage.Event{
 			UUID:       uuid,
 			CreateDate: r.Create,
 			EventDate:  r.EventDate,
 			Message:    r.Comment.String,
 			IsSended:   r.IsSended,
-		})
+		}
 	}
+
+	//log.Printf("grpc-server.storage.postgre.mapEvent %v", result)
 	return result, nil
 }

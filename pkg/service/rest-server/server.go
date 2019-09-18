@@ -12,6 +12,7 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
+	applogger "github.com/kapustkin/go_calendar/pkg/service/rest-server/logger/mylogger"
 	"github.com/sirupsen/logrus"
 )
 
@@ -19,8 +20,8 @@ import (
 func Run(args []string) error {
 	c := config.InitConfig()
 	// Data Access Layer init
-
-	grpcDal := dal.Init(c.GRPC)
+	appLogger := applogger.Init(c.Logging)
+	grpcDal := dal.Init(c.GRPC, appLogger)
 
 	r := chi.NewRouter()
 	// Middleware

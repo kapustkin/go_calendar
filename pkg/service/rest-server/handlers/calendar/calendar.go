@@ -3,8 +3,8 @@ package calendar
 import (
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
@@ -60,9 +60,12 @@ func (e *EventHandler) AddEvent(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}
 
-	event := dal.Event{UUID: uuid, Date: time.Now(), Message: data.Message}
+	event := dal.Event{UUID: uuid, EventDate: data.EventDate, Message: data.Message}
 
 	user := chi.URLParam(req, userFieldName)
+
+	log.Printf("add event - %v", event)
+
 	result, err := e.dal.AddEvent(user, event)
 	if err != nil {
 		http.Error(res, err.Error(), http.StatusInternalServerError)

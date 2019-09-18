@@ -3,7 +3,7 @@ package calendar
 import (
 	"context"
 	"fmt"
-	"time"
+	"log"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
@@ -34,7 +34,7 @@ func (eventServer *EventServer) GetAll(ctx context.Context, req *pb.GetAllReques
 		return nil, status.Error(666, err.Error())
 	}
 	grpcResponse := make([]*pb.Event, len(events))
-	for _, v := range events {
+	for i, v := range events {
 		evDate, err := ptypes.TimestampProto(v.EventDate)
 		if err != nil {
 			return nil, err
@@ -44,19 +44,21 @@ func (eventServer *EventServer) GetAll(ctx context.Context, req *pb.GetAllReques
 			return nil, err
 		}
 
-		grpcResponse = append(grpcResponse, &pb.Event{
+		grpcResponse[i] = &pb.Event{
 			Uuid:       v.UUID.String(),
 			Message:    v.Message,
 			CreateDate: crDate,
-			EventDate:  evDate})
+			EventDate:  evDate,
+			IsSended:   v.IsSended}
 	}
+
 	return &pb.GetAllResponse{Events: grpcResponse}, nil
 }
 
 // Add добавляет новое событие
 func (eventServer *EventServer) Add(ctx context.Context, req *pb.AddRequest) (*pb.AddResponse, error) {
 	event := req.GetEvent()
-
+	log.Printf("Add event - %v", event)
 	uuid, err := uuid.Parse(event.GetUuid())
 	if err != nil {
 		return &pb.AddResponse{Success: false}, err
@@ -65,10 +67,14 @@ func (eventServer *EventServer) Add(ctx context.Context, req *pb.AddRequest) (*p
 	if err != nil {
 		return &pb.AddResponse{Success: false}, err
 	}
+	eventDate, err := ptypes.Timestamp(event.GetEventDate())
+	if err != nil {
+		return &pb.AddResponse{Success: false}, err
+	}
 	res, err := eventServer.db.AddEvent(&storage.Event{
 		UserID:     event.GetUserId(),
-		CreateDate: time.Now(),
-		EventDate:  createDate,
+		CreateDate: createDate,
+		EventDate:  eventDate,
 		UUID:       uuid,
 		Message:    event.Message,
 		IsSended:   false})
