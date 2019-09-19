@@ -125,11 +125,15 @@ func (eventServer *EventServer) Remove(ctx context.Context, req *pb.RemoveRequst
 }
 
 // GetEventsForSend получает события для рассылки
-func (eventServer *EventServer) GetEventsForSend(ctx context.Context, req *pb.GetEventsForNotifyRequest) (*pb.GetEventsForNotifyResponse, error) {
-	return nil, fmt.Errorf("Not implemented")
+func (eventServer *EventServer) GetEventsForSend(ctx context.Context,
+	req *pb.GetEventsForSendRequest) (*pb.GetEventsForSendResponse, error) {
+
+	return nil, fmt.Errorf("not implemented")
 }
 
 // SetEventAsSended отмечает событие как отправленное
-func (eventServer *EventServer) SetEventAsSended(ctx context.Context, req *pb.SetEventAsSendedRequest) (*pb.SetEventAsSendedResponse, error) {
-	return nil, fmt.Errorf("Not implemented")
+func (eventServer *EventServer) SetEventAsSent(ctx context.Context,
+	req *pb.SetEventAsSentRequest) (*pb.SetEventAsSentResponse, error) {
+
+	return nil, fmt.Errorf("not implemented")
 }

@@ -1,32 +1,50 @@
 package searcher
 
 import (
-	"context"
-	"log"
-	"time"
+	"fmt"
 
-	kafka "github.com/segmentio/kafka-go"
+	"github.com/kapustkin/go_calendar/pkg/service/event-searcher/config"
+	"github.com/kapustkin/go_calendar/pkg/service/event-searcher/grpc"
+	"github.com/kapustkin/go_calendar/pkg/service/event-searcher/kafka"
 )
 
-func Execute(topic string, partition int, connString string) {
-
-	conn, err := kafka.DialLeader(context.Background(), "tcp", connString, topic, partition)
-
+// Run process
+func Run() error {
+	c := config.InitConfig()
+	err := execute(c)
 	if err != nil {
-		log.Fatal(err)
+		return err
+	}
+	return nil
+}
+
+func execute(c *config.Config) error {
+	// Init connection to grpc
+	grpcConn := grpc.Init(c)
+
+	// Init connection to kafka
+	kafkaConn, err := kafka.Init(c)
+	if err != nil {
+		return fmt.Errorf("failed connect to kafka: %v", err.Error())
+	}
+	// Get messages from GRPC
+	events, err := grpcConn.GetEventsForNotify()
+	if err != nil {
+		return fmt.Errorf("grpc GetEventsForSendRequest error: %v", err.Error())
 	}
 
-	err = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
-	if err != nil {
-		log.Fatal(err)
+	// Send messages to kafka
+	for _, event := range events {
+		err = kafkaConn.AddMessage(fmt.Sprintf("%v %v %v", event.Date, event.User, event.Message))
+		if err != nil {
+			return fmt.Errorf("error sending message to kafka: %v", err.Error())
+		}
 	}
-	_, err = conn.WriteMessages(
-		kafka.Message{Value: []byte("one!")},
-		kafka.Message{Value: []byte("two!")},
-		kafka.Message{Value: []byte("three!")},
-	)
+
+	err = kafkaConn.Close()
 	if err != nil {
-		log.Fatal(err)
+		return fmt.Errorf("failed close connection to kafka: %v", err.Error())
 	}
-	conn.Close()
+
+	return nil
 }

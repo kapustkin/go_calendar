@@ -86,9 +86,9 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 
 func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
 	//TODO Impl
-	return nil, fmt.Errorf("Not implemented")
+	return nil, fmt.Errorf("not implemented")
 }
 func (d *DB) SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error) {
 	//TODO Impl
-	return false, fmt.Errorf("Not implemented")
+	return false, fmt.Errorf("not implemented")
 }

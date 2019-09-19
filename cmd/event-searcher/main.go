@@ -1,9 +1,14 @@
 package main
 
 import (
+	"log"
+
 	server "github.com/kapustkin/go_calendar/pkg/service/event-searcher"
 )
 
 func main() {
-	server.Execute("my-topic", 0, "192.168.1.242:9092")
+	err := server.Run()
+	if err != nil {
+		log.Fatalf("application exception: %v", err.Error())
+	}
 }

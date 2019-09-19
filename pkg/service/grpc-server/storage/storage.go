@@ -19,10 +19,10 @@ type Storage interface {
 
 // Event событие каледаря
 type Event struct {
-	CreateDate time.Time
 	UUID       uuid.UUID
-	UserID     int32
+	CreateDate time.Time
 	EventDate  time.Time
 	Message    string
+	UserID     int32
 	IsSended   bool
 }

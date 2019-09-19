@@ -24,7 +24,8 @@ func main() {
 		if err != nil {
 			break
 		}
-		log.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n", m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
+		log.Printf("message at topic/partition/offset %v/%v/%v: %s = %s\n",
+			m.Topic, m.Partition, m.Offset, string(m.Key), string(m.Value))
 		err = r.CommitMessages(ctx, m)
 		if err != nil {
 			log.Fatal(err)
