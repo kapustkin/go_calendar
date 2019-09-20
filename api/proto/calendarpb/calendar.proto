@@ -77,8 +77,7 @@ message GetEventsForSendResponse {
 }
 
 message SetEventAsSentRequest {
-    int32  userId = 1;
-    string uuid = 2;
+    string uuid = 1;
 }
 
 message SetEventAsSentResponse {

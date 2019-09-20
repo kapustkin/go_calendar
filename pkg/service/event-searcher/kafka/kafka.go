@@ -2,7 +2,6 @@ package kafka
 
 import (
 	"context"
-	"log"
 	"time"
 
 	"github.com/kapustkin/go_calendar/pkg/service/event-searcher/config"
@@ -20,7 +19,7 @@ func Init(c *config.Config) (*Kafka, error) {
 	}
 	err = conn.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	return &Kafka{conn}, nil
 }

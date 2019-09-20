@@ -123,8 +123,9 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
 	events := []eventTable{}
 	err := d.db.Select(&events,
-		`SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE eventdate > current_date + interval '%i' day`,
-		daysBeforeEvent)
+		`SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE 
+		 issended = false AND 
+		 eventdate > current_date + interval '7' day`)
 	if err != nil {
 		return nil, err
 	}
@@ -135,13 +136,12 @@ func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
 	return res, nil
 }
 
-func (d *DB) SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error) {
+func (d *DB) SetEventAsSended(uuid uuid.UUID) (bool, error) {
 	val, err := d.db.NamedExec(`
 	UPDATE events SET 
 	(issended) = (:issended) 
-	WHERE user_id = :user_id AND uuid = :uuid`,
+	WHERE uuid = :uuid`,
 		map[string]interface{}{
-			"user_id":  userID,
 			"uuid":     uuid.String(),
 			"issended": true,
 		})

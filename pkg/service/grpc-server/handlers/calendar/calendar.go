@@ -111,7 +111,6 @@ func (eventServer *EventServer) Edit(ctx context.Context, req *pb.EditRequest) (
 
 // Remove удаляет событие
 func (eventServer *EventServer) Remove(ctx context.Context, req *pb.RemoveRequst) (*pb.RemoveResponse, error) {
-
 	uuid, err := uuid.Parse(req.GetUuid())
 	if err != nil {
 		return &pb.RemoveResponse{Success: false}, err
@@ -127,13 +126,43 @@ func (eventServer *EventServer) Remove(ctx context.Context, req *pb.RemoveRequst
 // GetEventsForSend получает события для рассылки
 func (eventServer *EventServer) GetEventsForSend(ctx context.Context,
 	req *pb.GetEventsForSendRequest) (*pb.GetEventsForSendResponse, error) {
+	const daysBeforeEvent = 7
+	events, err := eventServer.db.GetEventsForSend(daysBeforeEvent)
+	if err != nil {
+		return nil, fmt.Errorf("getEventsForSend failed: %v", err.Error())
+	}
+	grpcResponse := make([]*pb.Event, len(events))
+	for i, v := range events {
+		evDate, err := ptypes.TimestampProto(v.EventDate)
+		if err != nil {
+			return nil, fmt.Errorf("event date parse failed: %v", err)
+		}
+		crDate, err := ptypes.TimestampProto(v.CreateDate)
+		if err != nil {
+			return nil, fmt.Errorf("create date parse failed: %v", err)
+		}
 
-	return nil, fmt.Errorf("not implemented")
+		grpcResponse[i] = &pb.Event{
+			Uuid:       v.UUID.String(),
+			Message:    v.Message,
+			CreateDate: crDate,
+			EventDate:  evDate,
+			IsSended:   v.IsSended}
+	}
+
+	return &pb.GetEventsForSendResponse{Events: grpcResponse}, nil
 }
 
 // SetEventAsSended отмечает событие как отправленное
 func (eventServer *EventServer) SetEventAsSent(ctx context.Context,
 	req *pb.SetEventAsSentRequest) (*pb.SetEventAsSentResponse, error) {
-
-	return nil, fmt.Errorf("not implemented")
+	uuid, err := uuid.Parse(req.GetUuid())
+	if err != nil {
+		return &pb.SetEventAsSentResponse{Success: false}, fmt.Errorf("parse uuid failed %v", err.Error())
+	}
+	res, err := eventServer.db.SetEventAsSended(uuid)
+	if err != nil {
+		return &pb.SetEventAsSentResponse{Success: false}, err
+	}
+	return &pb.SetEventAsSentResponse{Success: res}, nil
 }

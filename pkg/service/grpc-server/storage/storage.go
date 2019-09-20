@@ -14,7 +14,7 @@ type Storage interface {
 	RemoveEvent(userID int32, uuid uuid.UUID) (bool, error)
 
 	GetEventsForSend(daysBeforeEvent int32) ([]Event, error)
-	SetEventAsSended(userID int32, uuid uuid.UUID) (bool, error)
+	SetEventAsSended(uuid uuid.UUID) (bool, error)
 }
 
 // Event событие каледаря

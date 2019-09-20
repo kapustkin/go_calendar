@@ -16,6 +16,7 @@ type Server struct {
 }
 
 type Event struct {
+	UUID    string
 	User    string
 	Message string
 	Date    string
@@ -26,7 +27,7 @@ func Init(c *config.Config) *Server {
 	return &Server{conn}
 }
 
-func (g *Server) GetEventsForNotify() ([]Event, error) {
+func (g *Server) GetEventsForSend() ([]Event, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
 	defer cancel()
 
@@ -40,10 +41,23 @@ func (g *Server) GetEventsForNotify() ([]Event, error) {
 
 	for i, v := range events.Events {
 		result[i] = Event{
+			UUID:    v.GetUuid(),
 			Date:    v.GetEventDate().String(),
 			User:    v.GetUserName(),
 			Message: v.GetMessage()}
 	}
 
 	return result, nil
+}
+
+func (g *Server) SetEventAsSended(uuid string) (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	defer cancel()
+
+	result, err := calendarpb.NewCalendarEventsClient(g.connection).SetEventAsSent(ctx,
+		&calendarpb.SetEventAsSentRequest{Uuid: uuid})
+	if err != nil {
+		return false, err
+	}
+	return result.Success, nil
 }
