@@ -3,12 +3,12 @@ package calendar
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/google/uuid"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
+	logger "github.com/sirupsen/logrus"
 )
 
 const userFieldName string = "user"
@@ -27,18 +27,23 @@ func Init(d *dal.GrpcDal) *EventHandler {
 // GetEvents all events for user
 func (e *EventHandler) GetEvents(res http.ResponseWriter, req *http.Request) {
 	user := chi.URLParam(req, userFieldName)
+	logger.Infof("userId: %v", user)
 	events, err := e.dal.GetAllEvents(user)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	logger.Infof("recieved %v events", len(events))
 	data, err := json.Marshal(events)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	_, err = res.Write(data)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -48,32 +53,36 @@ func (e *EventHandler) GetEvents(res http.ResponseWriter, req *http.Request) {
 func (e *EventHandler) AddEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
 	var data dal.Event
 	err = json.Unmarshal(body, &data)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errParsing, http.StatusForbidden)
 	}
+
 	uuid, err := uuid.NewUUID()
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 	}
 
 	event := dal.Event{UUID: uuid, EventDate: data.EventDate, Message: data.Message}
-
 	user := chi.URLParam(req, userFieldName)
-
-	log.Printf("add event - %v", event)
-
+	logger.Infof("event :%v", event)
 	result, err := e.dal.AddEvent(user, event)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if !result {
-		http.Error(res, "Add record failed", http.StatusInternalServerError)
+		message := "insert event failed"
+		logger.Warn(message)
+		http.Error(res, message, http.StatusInternalServerError)
 	}
 }
 
@@ -81,22 +90,28 @@ func (e *EventHandler) AddEvent(res http.ResponseWriter, req *http.Request) {
 func (e *EventHandler) EditEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
 	var event dal.Event
 	err = json.Unmarshal(body, &event)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errParsing, http.StatusForbidden)
 	}
+	logger.Infof("event :%v", event)
 	user := chi.URLParam(req, userFieldName)
 	result, err := e.dal.EditEvent(user, event)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if !result {
-		http.Error(res, "no record for edit", http.StatusNotFound)
+		message := "no record for edit"
+		logger.Warn(message)
+		http.Error(res, message, http.StatusNotFound)
 	}
 }
 
@@ -104,22 +119,27 @@ func (e *EventHandler) EditEvent(res http.ResponseWriter, req *http.Request) {
 func (e *EventHandler) RemoveEvent(res http.ResponseWriter, req *http.Request) {
 	body, err := ioutil.ReadAll(req.Body)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errReadBody, http.StatusForbidden)
 	}
-	var data dal.Event
-	err = json.Unmarshal(body, &data)
+	var event dal.Event
+	err = json.Unmarshal(body, &event)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, errParsing, http.StatusNotImplemented)
 	}
-
+	logger.Infof("event :%v", event)
 	user := chi.URLParam(req, userFieldName)
-	result, err := e.dal.RemoveEvent(user, data.UUID)
+	result, err := e.dal.RemoveEvent(user, event.UUID)
 	if err != nil {
+		logger.Errorf(err.Error())
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if !result {
-		http.Error(res, "no record for remove", http.StatusNotFound)
+		message := "no record for remove"
+		logger.Warn(message)
+		http.Error(res, message, http.StatusNotFound)
 	}
 }

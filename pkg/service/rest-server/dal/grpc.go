@@ -9,23 +9,21 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/google/uuid"
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
-	logger "github.com/kapustkin/go_calendar/pkg/service/rest-server/logger/mylogger"
+
+	//logger "github.com/kapustkin/go_calendar/pkg/service/rest-server/logger/mylogger"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )
 
-const timeout = 1000
-const service = "rest-server.dal.grpc"
-
 type GrpcDal struct {
 	connection *grpc.ClientConn
-	log        *logger.AppLogger
+	timeout    time.Duration
 }
 
 // Init инициализация Data Access Layer
-func Init(addr string, logger *logger.AppLogger) *GrpcDal {
+func Init(addr string) *GrpcDal {
 	conn, _ := grpc.Dial(addr, grpc.WithInsecure())
-	return &GrpcDal{conn, logger}
+	return &GrpcDal{connection: conn, timeout: 1000}
 }
 
 // Event событие каледаря
@@ -37,13 +35,12 @@ type Event struct {
 
 // GetAllEvents return all user events
 func (g *GrpcDal) GetAllEvents(userID string) ([]Event, error) {
-	g.log.Log(service, logger.Debug, fmt.Sprintf("call GetAllEvents(userID:%v)", userID))
 	userid, err := strconv.ParseInt(userID, 10, 32)
 	if err != nil {
 		return nil, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), g.timeout*time.Millisecond)
 	defer cancel()
 
 	events, err := calendarpb.NewCalendarEventsClient(g.connection).GetAll(ctx,
@@ -77,7 +74,7 @@ func (g *GrpcDal) AddEvent(userID string, event Event) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("parsing error: %v", err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), g.timeout*time.Millisecond)
 	defer cancel()
 
 	crDate, err := ptypes.TimestampProto(time.Now())
@@ -118,7 +115,7 @@ func (g *GrpcDal) EditEvent(userID string, event Event) (bool, error) {
 		return false, err
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), g.timeout*time.Millisecond)
 	defer cancel()
 
 	evDate, err := time.Parse(time.RFC3339Nano, event.EventDate)
@@ -152,7 +149,7 @@ func (g *GrpcDal) RemoveEvent(userID string, uuid fmt.Stringer) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), timeout*time.Millisecond)
+	ctx, cancel := context.WithTimeout(context.Background(), g.timeout*time.Millisecond)
 	defer cancel()
 
 	result, err := calendarpb.NewCalendarEventsClient(g.connection).Remove(ctx,

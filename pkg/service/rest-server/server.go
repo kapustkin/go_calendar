@@ -11,35 +11,33 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/config"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
-	"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
-	applogger "github.com/kapustkin/go_calendar/pkg/service/rest-server/logger/mylogger"
-	"github.com/sirupsen/logrus"
+
+	//"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
+	"github.com/kapustkin/go_calendar/pkg/logger"
 )
 
 // Run основной обработчик
 func Run(args []string) error {
+	// logger init
+	applogger := logger.Init("rest-server", "0.0.1")
+	applogger.Info("starting app...")
 	c := config.InitConfig()
-	// Data Access Layer init
-	appLogger := applogger.Init(c.Logging)
-	grpcDal := dal.Init(c.GRPC, appLogger)
+	applogger.Infof("use config: %v", c)
+	// data access Layer init
+	grpcDal := dal.Init(c.GRPC)
 
 	r := chi.NewRouter()
-	// Middleware
+	// middleware
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
-
 	// Logging
 	switch c.Logging {
 	case 1:
 		r.Use(middleware.Logger)
 	case 2:
-		log := logrus.New()
-		log.Formatter = &logrus.JSONFormatter{
-			DisableTimestamp: true,
-		}
-		r.Use(logger.NewChiLogger(log))
+		r.Use(logger.NewChiLogger())
 	default:
 		log.Printf("Warning! Starting without logging... \n")
 	}
@@ -53,6 +51,6 @@ func Run(args []string) error {
 		r.Post("/{user}/edit", calendarService.EditEvent)
 		r.Post("/{user}/remove", calendarService.RemoveEvent)
 	})
-
+	applogger.Infof("listner started...")
 	return http.ListenAndServe(fmt.Sprintf("%s:%v", c.Host, c.Port), r)
 }

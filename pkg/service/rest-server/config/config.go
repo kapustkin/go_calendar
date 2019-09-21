@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	flag "github.com/spf13/pflag"
 )
 
@@ -22,6 +20,5 @@ func InitConfig() *Config {
 	flag.IntVarP(&cfg.Logging, "log", "l", 0, "application logger. 0 - Disable, 1 - Standart, 2 - Verbose json")
 	flag.StringVarP(&cfg.GRPC, "grpc", "g", "localhost:5900", "grpc server application address")
 	flag.Parse()
-	log.Printf("Initital app with config %v", cfg)
 	return &cfg
 }
