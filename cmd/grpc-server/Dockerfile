@@ -10,7 +10,7 @@ LABEL maintainer="Alexandr Kapustkin <a.kapustkin@gmail.com>"
 WORKDIR /app
 
 # Build the Go app
-RUN go build -o main ./cmd/grpc-server/
+RUN go build -o main .
 
 # Expose port 8080 to the outside world
 EXPOSE 8080
