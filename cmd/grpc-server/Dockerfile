@@ -8,8 +8,10 @@ LABEL maintainer="Alexandr Kapustkin <a.kapustkin@gmail.com>"
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
-
+# Copy files
 COPY . .
+# Update packages
+RUN go get -d -v
 # Build the Go app
 RUN go build -o rest-server ./...
 
