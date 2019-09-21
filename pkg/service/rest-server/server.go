@@ -2,29 +2,27 @@ package rest
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+	"github.com/kapustkin/go_calendar/pkg/logger"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/config"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
-
-	//"github.com/kapustkin/go_calendar/pkg/service/rest-server/logger"
-	"github.com/kapustkin/go_calendar/pkg/logger"
+	log "github.com/sirupsen/logrus"
 )
 
 // Run основной обработчик
 func Run(args []string) error {
 	// logger init
-	applogger := logger.Init("rest-server", "0.0.1")
-	applogger.Info("starting app...")
-	c := config.InitConfig()
-	applogger.Infof("use config: %v", c)
+	logger.Init("rest-server", "0.0.1")
+	log.Info("starting app...")
+	conf := config.InitConfig()
+	log.Infof("use config: %v", conf)
 	// data access Layer init
-	grpcDal := dal.Init(c.GRPC)
+	grpcDal := dal.Init(conf.GRPC)
 
 	r := chi.NewRouter()
 	// middleware
@@ -33,13 +31,13 @@ func Run(args []string) error {
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
 	// Logging
-	switch c.Logging {
+	switch conf.Logging {
 	case 1:
 		r.Use(middleware.Logger)
 	case 2:
 		r.Use(logger.NewChiLogger())
 	default:
-		log.Printf("Warning! Starting without logging... \n")
+		log.Warn("starting without request logging...")
 	}
 
 	calendarService := calendar.Init(grpcDal)
@@ -51,6 +49,6 @@ func Run(args []string) error {
 		r.Post("/{user}/edit", calendarService.EditEvent)
 		r.Post("/{user}/remove", calendarService.RemoveEvent)
 	})
-	applogger.Infof("listner started...")
-	return http.ListenAndServe(fmt.Sprintf("%s:%v", c.Host, c.Port), r)
+	log.Infof("listner started...")
+	return http.ListenAndServe(fmt.Sprintf("%s:%v", conf.Host, conf.Port), r)
 }

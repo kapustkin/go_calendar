@@ -13,7 +13,7 @@ type Storage interface {
 	EditEvent(event *Event) (bool, error)
 	RemoveEvent(userID int32, uuid uuid.UUID) (bool, error)
 
-	GetEventsForSend(daysBeforeEvent int32) ([]Event, error)
+	GetEventsForSend() ([]Event, error)
 	SetEventAsSended(uuid uuid.UUID) (bool, error)
 }
 

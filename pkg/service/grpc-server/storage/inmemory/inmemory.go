@@ -84,7 +84,7 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 	return false, fmt.Errorf("record %s not found", uuid)
 }
 
-func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
+func (d *DB) GetEventsForSend() ([]storage.Event, error) {
 	//TODO Impl
 	return nil, fmt.Errorf("not implemented")
 }

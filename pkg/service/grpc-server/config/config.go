@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	flag "github.com/spf13/pflag"
 )
 
@@ -25,6 +23,5 @@ func InitConfig() *Config {
 		"postgres://log:pass@localhost/ms_calendar?sslmode=disable",
 		"connection string for storage")
 	flag.Parse()
-	log.Printf("Initital app with config %v", cfg)
 	return &cfg
 }

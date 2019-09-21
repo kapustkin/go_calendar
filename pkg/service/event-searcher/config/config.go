@@ -1,8 +1,6 @@
 package config
 
 import (
-	"log"
-
 	flag "github.com/spf13/pflag"
 )
 
@@ -30,6 +28,5 @@ func InitConfig() *Config {
 		"application logger. 0 - Disable, 1 - Standart")
 
 	flag.Parse()
-	log.Printf("Initital app with config %v", cfg)
 	return &cfg
 }

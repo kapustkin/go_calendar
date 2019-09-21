@@ -120,7 +120,7 @@ func (d *DB) RemoveEvent(userID int32, uuid uuid.UUID) (bool, error) {
 	return true, nil
 }
 
-func (d *DB) GetEventsForSend(daysBeforeEvent int32) ([]storage.Event, error) {
+func (d *DB) GetEventsForSend() ([]storage.Event, error) {
 	events := []eventTable{}
 	err := d.db.Select(&events,
 		`SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE 

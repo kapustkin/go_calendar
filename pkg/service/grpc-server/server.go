@@ -2,12 +2,14 @@ package grpc
 
 import (
 	"fmt"
-	"log"
+
 	"net"
 
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
+	"github.com/kapustkin/go_calendar/pkg/logger"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/handlers/calendar"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/config"
 	"github.com/kapustkin/go_calendar/pkg/service/grpc-server/storage/inmemory"
@@ -17,8 +19,10 @@ import (
 
 // Run запуск GRPC сервера
 func Run() error {
+	logger.Init("grpc-server", "0.0.1")
+	log.Info("starting app...")
 	conf := config.InitConfig()
-
+	log.Infof("use config: %v", conf)
 	db := getStorage(conf.StorageType, conf.ConnectionString)
 
 	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))

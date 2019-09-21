@@ -11,19 +11,19 @@ import (
 )
 
 // Init initializes the standard logger
-func Init(app string, version string) *log.Entry {
+func Init(app string, version string) {
 	plainFormatter := new(PlainFormatter)
 	plainFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	plainFormatter.LevelDesc = []string{"PANC", "FATL", "ERRO", "WARN", "INFO", "DEBG"}
 
 	log.SetFormatter(plainFormatter)
 	log.SetReportCaller(true)
-	requestLogger := log.WithFields(
+	log.WithFields(
 		log.Fields{
 			"app":     app,
 			"version": version,
 		})
-	return requestLogger
+	//return requestLogger
 }
 
 type PlainFormatter struct {
@@ -37,7 +37,7 @@ func (f *PlainFormatter) Format(entry *log.Entry) ([]byte, error) {
 		"%s %s %v:L%v %s\n",
 		f.LevelDesc[entry.Level],
 		timestamp,
-		entry.Caller.Func.Name(),
+		entry.Caller.Function,
 		entry.Caller.Line,
 		entry.Message)), nil
 }
