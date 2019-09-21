@@ -34,7 +34,7 @@ func (e *EventHandler) GetEvents(res http.ResponseWriter, req *http.Request) {
 		http.Error(res, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	logger.Infof("recieved %v events", len(events))
+	logger.Infof("received %v events", len(events))
 	data, err := json.Marshal(events)
 	if err != nil {
 		logger.Errorf(err.Error())

@@ -36,7 +36,7 @@ func (eventServer *EventServer) GetAll(ctx context.Context, req *pb.GetAllReques
 		logger.Errorf(err.Error())
 		return nil, status.Error(666, err.Error())
 	}
-	logger.Infof("%v events recieved", len(events))
+	logger.Infof("%v events received", len(events))
 	grpcResponse := make([]*pb.Event, len(events))
 	for i, v := range events {
 		evDate, err := ptypes.TimestampProto(v.EventDate)
