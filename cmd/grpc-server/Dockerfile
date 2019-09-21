@@ -9,11 +9,12 @@ LABEL maintainer="Alexandr Kapustkin <a.kapustkin@gmail.com>"
 # Set the Current Working Directory inside the container
 WORKDIR /app
 
+COPY . .
 # Build the Go app
-RUN go build -o main .
+RUN go build -o rest-server ./...
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 5900 to the outside world
+EXPOSE 5900
 
 # Command to run the executable
-CMD ["./main"]
+CMD ["./rest-server"]
