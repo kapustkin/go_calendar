@@ -28,7 +28,7 @@ require (
 	github.com/spf13/cobra v0.0.5 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.3
-	github.com/spf13/viper v1.4.0 // indirect
+	github.com/spf13/viper v1.4.0
 	github.com/ultraware/funlen v0.0.2 // indirect
 	golang.org/x/net v0.0.0-20190912160710-24e19bdeb0f2
 	golang.org/x/sys v0.0.0-20190913121621-c3b328c6e5a7 // indirect

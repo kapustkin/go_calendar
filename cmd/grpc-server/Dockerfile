@@ -20,4 +20,4 @@ EXPOSE 5900
 # Command to run the executable
 ENTRYPOINT ["./rest-server"]
 # params
-CMD ["-l 1"]  
+CMD [""]  
