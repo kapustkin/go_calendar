@@ -17,6 +17,7 @@ RUN go build -o rest-server ./...
 
 # Expose port 5900 to the outside world
 EXPOSE 5900
-
 # Command to run the executable
-CMD ["./rest-server"]
+ENTRYPOINT ["./rest-server"]
+# params
+CMD ["-l 1"]  
