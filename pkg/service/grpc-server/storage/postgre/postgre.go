@@ -125,7 +125,7 @@ func (d *DB) GetEventsForSend() ([]storage.Event, error) {
 	err := d.db.Select(&events,
 		`SELECT uuid,eventcreate,eventdate,comment,issended FROM events WHERE 
 		 issended = false AND 
-		 eventdate > current_date + interval '7' day`)
+		 eventdate < current_date + interval '7' day`)
 	if err != nil {
 		return nil, err
 	}
