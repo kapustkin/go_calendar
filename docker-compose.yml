@@ -1,0 +1,94 @@
+version: '3'
+
+networks:
+  app:
+    driver: bridge
+
+services:
+  grpc-server:
+    build: ./cmd/grpc-server
+    depends_on:
+      - postgres
+    restart: on-failure
+    environment:
+      - GRPC_SERVER_HOST=:5900
+      - GRPC_SERVER_STORAGE=1
+      - GRPC_SERVER_CONN=postgres://calendar:password@postgres/ms_calendar?sslmode=disable
+    networks: 
+      - app
+
+  rest-server:
+    build: ./cmd/rest-server
+    depends_on:
+      - grpc-server
+    restart: on-failure
+    ports:
+     - "5000:5000"
+    environment:
+      - REST_SERVER_GRPC_HOST=grpc-server:5900
+      - REST_SERVER_HOST=:5000
+      - REST_SERVER_LOGGER=1
+    networks: 
+      - app
+
+  event-searcher:
+    build: ./cmd/event-searcher
+    depends_on:
+      - grpc-server
+      - zookeeper
+      - kafka
+    restart: on-failure
+    environment:
+      - EVENT_SEARCHER_HOST=kafka:9092
+      - EVENT_SEARCHER_TOPIC=calendar_eventsForSend      
+      - EVENT_SEARCHER_GRPC_HOST=grpc-server:5900
+      - EVENT_SEARCHER_LOGGER=1
+    networks: 
+      - app
+
+  event-sender:
+    build: ./cmd/event-sender
+    depends_on:
+      - event-searcher
+      - kafka
+    restart: on-failure
+    environment:
+      - EVENT_SENDER_HOST=kafka:9092
+      - EVENT_SENDER_TOPIC=calendar_eventsForSend
+      - EVENT_SENDER_LOGGER=1
+    networks: 
+      - app
+
+  postgres:
+    image: postgres:11.1
+    restart: on-failure
+    environment:
+      POSTGRES_USER: calendar
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ms_calendar
+    volumes:
+      - ./scripts/setup.sql:/docker-entrypoint-initdb.d/setup.sql
+    networks:
+      - app 
+
+  zookeeper:
+    image: 'bitnami/zookeeper:latest'
+    depends_on:
+      - kafka
+    logging:
+      driver: none
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+    restart: on-failure
+    networks: 
+      - app
+  kafka:
+    image: 'bitnami/kafka:latest'
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+    logging:
+      driver: none
+    restart: on-failure
+    networks: 
+      - app
