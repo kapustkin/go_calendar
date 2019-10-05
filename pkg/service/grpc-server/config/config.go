@@ -1,26 +1,24 @@
 package config
 
 import (
-	"log"
-
+	"github.com/kelseyhightower/envconfig"
+	log "github.com/sirupsen/logrus"
 	flag "github.com/spf13/pflag"
-	viper "github.com/spf13/viper"
 )
+
+const ENV_PREFIX = "GRPC_SERVER"
 
 // Config app configuration
 type Config struct {
-	Port             int
-	Host             string
-	StorageType      int
-	ConnectionString string
+	Host             string `envconfig:"HOST"`
+	StorageType      int    `envconfig:"STORAGE"`
+	ConnectionString string `envconfig:"CONN"`
 }
 
 // InitConfig initial config
 func InitConfig() *Config {
 	cfg := Config{}
-
-	flag.IntVarP(&cfg.Port, "port", "p", 5900, "application port")
-	flag.StringVarP(&cfg.Host, "host", "h", "localhost", "application host")
+	flag.StringVarP(&cfg.Host, "host", "h", "localhost:5000", "application host")
 	flag.IntVarP(&cfg.StorageType, "storage", "s", 1, "application storage. 0 - inmemory, 1 - posgres")
 	flag.StringVarP(&cfg.ConnectionString,
 		"connection", "c",
@@ -28,21 +26,9 @@ func InitConfig() *Config {
 		"connection string for storage")
 	flag.Parse()
 
-	err := viper.BindPFlags(flag.CommandLine)
+	err := envconfig.Process(ENV_PREFIX, &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}
-
-	viper.SetEnvPrefix("cal_grpc")
-
-	_ = viper.BindEnv("port")
-	_ = viper.BindEnv("host")
-	_ = viper.BindEnv("storage")
-	_ = viper.BindEnv("conn")
-
-	cfg.Port = viper.GetInt("port")
-	cfg.Host = viper.GetString("host")
-	cfg.StorageType = viper.GetInt("storage")
-	cfg.ConnectionString = viper.GetString("conn")
 	return &cfg
 }

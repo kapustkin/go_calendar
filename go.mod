@@ -14,6 +14,7 @@ require (
 	github.com/google/uuid v1.1.1
 	github.com/gostaticanalysis/analysisutil v0.0.3 // indirect
 	github.com/jmoiron/sqlx v1.2.0
+	github.com/kelseyhightower/envconfig v1.4.0
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/lib/pq v1.2.0
 	github.com/magiconair/properties v1.8.1 // indirect

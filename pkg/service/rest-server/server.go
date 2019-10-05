@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -50,5 +49,5 @@ func Run(args []string) error {
 		r.Post("/{user}/remove", calendarService.RemoveEvent)
 	})
 	log.Infof("listner started...")
-	return http.ListenAndServe(fmt.Sprintf("%s:%v", conf.Host, conf.Port), r)
+	return http.ListenAndServe(conf.Host, r)
 }

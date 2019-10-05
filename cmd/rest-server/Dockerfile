@@ -13,12 +13,12 @@ COPY . .
 # Update packages
 RUN go get -d -v
 # Build the Go app
-RUN CGO_ENABLED=0 go build -o grpc-server ./...
+RUN CGO_ENABLED=0 go build -o rest-server ./...
 
 
 # STEP 2 build a small image
 # start from scratch
 FROM alpine:latest
 # Copy our static executable
-COPY --from=builder /go/bin/grpc-server /go/bin/grpc-server
-ENTRYPOINT ["/go/bin/grpc-server"]
+COPY --from=builder /go/bin/rest-server /go/bin/rest-server
+ENTRYPOINT ["/go/bin/rest-server"]

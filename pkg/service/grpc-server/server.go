@@ -1,8 +1,6 @@
 package grpc
 
 import (
-	"fmt"
-
 	"net"
 
 	calendarpb "github.com/kapustkin/go_calendar/pkg/api/v1"
@@ -25,7 +23,7 @@ func Run() error {
 	log.Infof("use config: %v", conf)
 	db := getStorage(conf.StorageType, conf.ConnectionString)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("%s:%d", conf.Host, conf.Port))
+	lis, err := net.Listen("tcp", conf.Host)
 	if err != nil {
 		return err
 	}
