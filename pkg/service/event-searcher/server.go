@@ -2,6 +2,7 @@ package searcher
 
 import (
 	"fmt"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -17,11 +18,14 @@ func Run() error {
 	log.Info("starting app...")
 	conf := config.InitConfig()
 	log.Infof("use config: %v", conf)
-	err := execute(conf)
-	if err != nil {
-		return err
+	for {
+		err := execute(conf)
+		if err != nil {
+			return err
+		}
+
+		time.Sleep(60 * time.Second)
 	}
-	return nil
 }
 
 func execute(c *config.Config) error {
