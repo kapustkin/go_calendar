@@ -139,7 +139,7 @@ func (d *DB) GetEventsForSend() ([]storage.Event, error) {
 func (d *DB) SetEventAsSended(uuid uuid.UUID) (bool, error) {
 	val, err := d.db.NamedExec(`
 	UPDATE events SET 
-	(issended) = (:issended) 
+	issended = :issended
 	WHERE uuid = :uuid`,
 		map[string]interface{}{
 			"uuid":     uuid.String(),

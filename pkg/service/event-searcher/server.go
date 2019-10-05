@@ -48,12 +48,6 @@ func execute(c *config.Config) error {
 	log.Infof("received %v events for sending", len(events))
 	// Send messages to kafka
 	for _, event := range events {
-		err = kafkaConn.AddMessage(fmt.Sprintf("%v %v %v", event.Date, event.User, event.Message))
-		if err != nil {
-			log.Error(err.Error())
-			return fmt.Errorf("sending message to kafka failed: %v", err.Error())
-		}
-		log.Infof("%v - sended to kafka", event.UUID)
 		res, err := grpcConn.SetEventAsSended(event.UUID)
 		if err != nil {
 			log.Error(err.Error())
@@ -63,6 +57,13 @@ func execute(c *config.Config) error {
 			log.Warnf("update status for uuid %v failed", event.UUID)
 			return fmt.Errorf("update status for uuid %v failed", event.UUID)
 		}
+
+		err = kafkaConn.AddMessage(fmt.Sprintf("%v %v %v", event.Date, event.User, event.Message))
+		if err != nil {
+			log.Error(err.Error())
+			return fmt.Errorf("sending message to kafka failed: %v", err.Error())
+		}
+		log.Infof("%v - sended to kafka", event.UUID)
 	}
 
 	err = kafkaConn.Close()
