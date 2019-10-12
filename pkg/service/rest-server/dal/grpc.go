@@ -118,7 +118,7 @@ func (g *GrpcDal) EditEvent(userID string, event Event) (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), g.timeout*time.Millisecond)
 	defer cancel()
 
-	evDate, err := time.Parse(time.RFC3339Nano, event.EventDate)
+	evDate, err := time.Parse("2006-01-02T15:04", event.EventDate)
 	if err != nil {
 		return false, err
 	}
