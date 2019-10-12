@@ -47,19 +47,6 @@ services:
     networks: 
       - app
 
-  event-sender:
-    build: ./cmd/event-sender
-    depends_on:
-      - event-searcher
-      - kafka
-    restart: on-failure
-    environment:
-      - EVENT_SENDER_HOST=kafka:9092
-      - EVENT_SENDER_TOPIC=calendar_eventsForSend
-      - EVENT_SENDER_LOGGER=1
-    networks: 
-      - app
-
   postgres:
     image: postgres:11.1
     restart: on-failure

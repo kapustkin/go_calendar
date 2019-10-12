@@ -13,6 +13,9 @@ test:
 lint:
 	$(shell go env GOPATH)/bin/golangci-lint run --enable-all
 
+godog:
+	$(shell go env GOPATH)/bin/godog ./cmd/integration-tests
+
 build:
 	go build -o=bin/grpc-server ./cmd/grpc-server/
 	go build -o=bin/rest-server ./cmd/rest-server/

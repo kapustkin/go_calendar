@@ -3,6 +3,7 @@ module github.com/kapustkin/go_calendar
 go 1.12
 
 require (
+	github.com/DATA-DOG/godog v0.7.13
 	github.com/fatih/color v1.7.0 // indirect
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/gogo/protobuf v1.3.0 // indirect
@@ -30,6 +31,7 @@ require (
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.3
 	github.com/spf13/viper v1.4.0
+	github.com/streadway/amqp v0.0.0-20190827072141-edfb9018d271
 	github.com/ultraware/funlen v0.0.2 // indirect
 	golang.org/x/net v0.0.0-20190912160710-24e19bdeb0f2
 	golang.org/x/sys v0.0.0-20190913121621-c3b328c6e5a7 // indirect
