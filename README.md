@@ -42,3 +42,9 @@ GRPC сервис
 * Получение списка событий
 * Отправка уведомления
 * Очистка старых событий
+
+
+Для запуска тестов
+```console
+docker-compose -f docker-compose.test.yml up --exit-code-from integration_tests
+```
