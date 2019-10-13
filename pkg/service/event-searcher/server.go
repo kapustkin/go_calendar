@@ -19,11 +19,11 @@ func Run() error {
 	conf := config.InitConfig()
 	log.Infof("use config: %v", conf)
 	for {
+		time.Sleep(time.Duration(conf.EventSearchDelay) * time.Second)
 		err := execute(conf)
 		if err != nil {
 			return err
 		}
-		time.Sleep(time.Duration(conf.EventSearchDelay) * time.Second)
 	}
 }
 

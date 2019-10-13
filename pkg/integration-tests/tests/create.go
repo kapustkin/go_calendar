@@ -26,8 +26,8 @@ func ExecCreateTest(s *godog.Suite, test *NotifyTest) {
 func (test *NotifyTest) startKafkaConsuming(interface{}) {
 	// read env config
 	conf := &config.Config{
-		KafkaConnection: "localhost:9092",
-		KafkaTopic:      "calendar_eventsForSend",
+		KafkaConnection: test.config.KafkaConnection,
+		KafkaTopic:      test.config.KafkaTopic,
 		//KafkaPartition:  1,
 	}
 	// init kafka

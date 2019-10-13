@@ -25,5 +25,6 @@ func TestMain(m *testing.M) {
 	if st := m.Run(); st > status {
 		status = st
 	}
+	//nolint:wsl
 	os.Exit(status)
 }

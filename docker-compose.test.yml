@@ -5,6 +5,19 @@ networks:
     driver: bridge
 
 services:
+  integration_tests:
+    build: ./cmd/integration-tests
+    command: "true"
+    links:
+      - rest-server
+      - kafka
+    environment:
+      - INTEGRATION_TESTS_KAFKA_HOST=kafka:9092
+      - INTEGRATION_TESTS_KAFKA_TOPIC=calendar_eventsForSend
+      - INTEGRATION_TESTS_REST_SERVER=rest-server:5000
+    networks:
+      - app
+
   grpc-server:
     build: ./cmd/grpc-server
     depends_on:

@@ -7,12 +7,12 @@ Feature: Редактирование события в календаре
         Тогда событие с переданным UUID обновится
 
         Scenario: Сервис отправки сообщений доступен
-                When посылаю "GET" запрос к "http://localhost:5000/ping"
+                When посылаю "GET" запрос к "http://{REST_SERVER}/ping"
                 Then ожидаю что код ответа будет 200
                 And тело ответа будет равно "OK"
 
         Scenario: Создать событие в календаре
-                When посылаю "POST" запрос к "http://localhost:5000/calendar/1/add" c "application/json" содержимым:
+                When посылаю "POST" запрос к "http://{REST_SERVER}/calendar/1/add" c "application/json" содержимым:
 		"""
                 { 
                 "Message": "купить новый порш каен",
@@ -22,7 +22,7 @@ Feature: Редактирование события в календаре
                 Then ожидаю что код ответа будет 200                
 
         Scenario: Найти событие в календаре у пользователя
-                When посылаю "GET" запрос к "http://localhost:5000/calendar/1" 
+                When посылаю "GET" запрос к "http://{REST_SERVER}/calendar/1" 
                 Then ожидаю что код ответа будет 200
                 And в ответе будет событие с Message:
                 """
@@ -33,7 +33,7 @@ Feature: Редактирование события в календаре
 		"""
 
         Scenario: Изменить событие в календаре
-                When посылаю "POST" запрос к "http://localhost:5000/calendar/1/edit" c "application/json" и новым содержимым:
+                When посылаю "POST" запрос к "http://{REST_SERVER}/calendar/1/edit" c "application/json" и новым содержимым:
 		"""
                 { 
                 "UUID":"{REPLACE_UUID}",
@@ -45,7 +45,7 @@ Feature: Редактирование события в календаре
                 
         
         Scenario: Проверить событие в календаре у пользователя
-                When посылаю "GET" запрос к "http://localhost:5000/calendar/1" 
+                When посылаю "GET" запрос к "http://{REST_SERVER}/calendar/1" 
                 Then ожидаю что код ответа будет 200
                 And в ответе будет измененное событие Message:
                 """
