@@ -43,6 +43,7 @@ services:
       - EVENT_SEARCHER_HOST=kafka:9092
       - EVENT_SEARCHER_TOPIC=calendar_eventsForSend      
       - EVENT_SEARCHER_GRPC_HOST=grpc-server:5900
+      - EVENT_SEARCHER_DELAY=60
       - EVENT_SEARCHER_LOGGER=1
     networks: 
       - app

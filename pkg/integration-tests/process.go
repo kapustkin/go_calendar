@@ -10,6 +10,7 @@ import (
 func FeatureContext(s *godog.Suite) {
 	// загрузка конфига
 	test := tests.Init()
+	// выход из сценария, если он завершился с ошибкой
 	s.AfterScenario(func(data interface{}, err error) {
 		if err != nil {
 			log.Fatalf("%v", err)

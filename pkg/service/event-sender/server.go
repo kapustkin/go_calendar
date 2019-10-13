@@ -33,9 +33,9 @@ func execute(c *config.Config) error {
 		return fmt.Errorf("failed connect to kafka: %v", err.Error())
 	}
 	log.Info("connection to kafka established")
-	ctx := context.Background()
+
 	for {
-		message, err := kafkaConn.GetMessage(ctx)
+		message, err := kafkaConn.GetMessage(context.Background())
 		if err != nil {
 			log.Errorf(err.Error())
 			return fmt.Errorf("failed GetMessage from kafka: %v", err.Error())

@@ -13,7 +13,6 @@ const ENV_PREFIX = "EVENT_SENDER"
 type Config struct {
 	KafkaConnection string `envconfig:"HOST"`
 	KafkaTopic      string `envconfig:"TOPIC"`
-	KafkaPartition  int    `envconfig:"PARTITION"`
 	Logging         int    `envconfig:"LOGGER"`
 }
 
@@ -23,9 +22,7 @@ func InitConfig() *Config {
 	flag.StringVarP(&cfg.KafkaConnection, "host", "h", "localhost:9092",
 		"kafka connection. Default 'localhost:9092'")
 	flag.StringVarP(&cfg.KafkaTopic, "topic", "t", "calendar_eventsForSend",
-		"kafka topic. Default 'eventsForSend'")
-	flag.IntVarP(&cfg.KafkaPartition, "partiotion", "p", 0,
-		"kafka partiotion. Default '0'")
+		"kafka topic. Default 'calendar_eventsForSend'")
 	flag.IntVarP(&cfg.Logging, "log", "l", 0,
 		"application logger. 0 - Disable, 1 - Standart")
 	flag.Parse()

@@ -13,12 +13,11 @@ type Kafka struct {
 
 func Init(c *config.Config) (*Kafka, error) {
 	reader := kafkalib.NewReader(kafkalib.ReaderConfig{
-		Brokers:   []string{c.KafkaConnection},
-		Topic:     c.KafkaTopic,
-		GroupID:   "event-searcher-001",
-		Partition: c.KafkaPartition,
-		MinBytes:  10e3, // 10KB
-		MaxBytes:  10e6, // 10MB
+		Brokers:  []string{c.KafkaConnection},
+		Topic:    c.KafkaTopic,
+		GroupID:  "event-searcher-001",
+		MinBytes: 10e3, // 10KB
+		MaxBytes: 10e6, // 10MB
 	})
 
 	return &Kafka{reader}, nil

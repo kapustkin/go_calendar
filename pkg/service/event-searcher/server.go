@@ -23,8 +23,7 @@ func Run() error {
 		if err != nil {
 			return err
 		}
-
-		time.Sleep(60 * time.Second)
+		time.Sleep(time.Duration(conf.EventSearchDelay) * time.Second)
 	}
 }
 

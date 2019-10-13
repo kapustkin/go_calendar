@@ -8,15 +8,22 @@ import (
 	"net/http"
 	"reflect"
 	"strings"
+	"sync"
 
 	"github.com/DATA-DOG/godog/gherkin"
+	"github.com/kapustkin/go_calendar/pkg/service/event-sender/kafka"
 )
 
 type notifyTest struct {
+	// kafka
+	kafkaConn     *kafka.Kafka
+	messages      [][]byte
+	messagesMutex *sync.RWMutex
+	stopSignal    chan struct{}
+	// rest
 	responseStatusCode int
 	responseBody       []byte
-
-	responseUUID string
+	responseUUID       string
 }
 
 func Init() *notifyTest {

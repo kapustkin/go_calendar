@@ -11,11 +11,12 @@ const ENV_PREFIX = "EVENT_SEARCHER"
 
 // Config app configuration
 type Config struct {
-	KafkaConnection string `envconfig:"HOST"`
-	KafkaTopic      string `envconfig:"TOPIC"`
-	KafkaPartition  int    `envconfig:"PARTITION"`
-	GrpcConnection  string `envconfig:"GRPC_HOST"`
-	Logging         int    `envconfig:"LOGGER"`
+	KafkaConnection  string `envconfig:"HOST"`
+	KafkaTopic       string `envconfig:"TOPIC"`
+	KafkaPartition   int    `envconfig:"PARTITION"`
+	GrpcConnection   string `envconfig:"GRPC_HOST"`
+	EventSearchDelay int64  `envconfig:"DELAY"`
+	Logging          int    `envconfig:"LOGGER"`
 }
 
 // InitConfig initial config
@@ -29,6 +30,8 @@ func InitConfig() *Config {
 		"kafka partiotion. Default '0'")
 	flag.StringVarP(&cfg.GrpcConnection, "grpc", "g", "localhost:5900",
 		"grpc server application address")
+	flag.Int64VarP(&cfg.EventSearchDelay, "delay", "d", 10,
+		"application event search delay. Default '10'")
 	flag.IntVarP(&cfg.Logging, "log", "l", 0,
 		"application logger. 0 - Disable, 1 - Standart")
 	flag.Parse()
