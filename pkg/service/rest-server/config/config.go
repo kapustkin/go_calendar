@@ -7,7 +7,7 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const ENV_PREFIX = "REST_SERVER"
+const envPrefix = "REST_SERVER"
 
 // Config app configuration
 type Config struct {
@@ -24,7 +24,7 @@ func InitConfig() *Config {
 	flag.StringVarP(&cfg.GRPC, "grpc-host", "g", "localhost:5900", "grpc server application address")
 	flag.Parse()
 
-	err := envconfig.Process(ENV_PREFIX, &cfg)
+	err := envconfig.Process(envPrefix, &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

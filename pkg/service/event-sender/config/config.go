@@ -7,7 +7,7 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const ENV_PREFIX = "EVENT_SENDER"
+const envPrefix = "EVENT_SENDER"
 
 // Config app configuration
 type Config struct {
@@ -27,7 +27,7 @@ func InitConfig() *Config {
 		"application logger. 0 - Disable, 1 - Standart")
 	flag.Parse()
 
-	err := envconfig.Process(ENV_PREFIX, &cfg)
+	err := envconfig.Process(envPrefix, &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

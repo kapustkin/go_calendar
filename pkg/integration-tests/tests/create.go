@@ -12,7 +12,7 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/kafka"
 )
 
-func ExecCreateTest(s *godog.Suite, test *notifyTest) {
+func ExecCreateTest(s *godog.Suite, test *NotifyTest) {
 	s.BeforeScenario(test.startKafkaConsuming)
 	s.Step(`^посылаю "([^"]*)" запрос к "([^"]*)"$`, test.iSendRequestTo)
 	s.Step(`^ожидаю что код ответа будет (\d+)$`, test.theResponseCodeShouldBe)
@@ -23,7 +23,7 @@ func ExecCreateTest(s *godog.Suite, test *notifyTest) {
 	s.Step(`^дождаться оповещения о событии с сообщением "([^"]*)"$`, test.iReceiveEventWithText)
 }
 
-func (test *notifyTest) startKafkaConsuming(interface{}) {
+func (test *NotifyTest) startKafkaConsuming(interface{}) {
 	// read env config
 	conf := &config.Config{
 		KafkaConnection: "localhost:9092",
@@ -58,7 +58,7 @@ func (test *notifyTest) startKafkaConsuming(interface{}) {
 	}(test.stopSignal)
 }
 
-func (test *notifyTest) iReceiveEventWithText(text string) error {
+func (test *NotifyTest) iReceiveEventWithText(text string) error {
 	<-test.recievedSignal
 	test.messagesMutex.RLock()
 	defer test.messagesMutex.RUnlock()

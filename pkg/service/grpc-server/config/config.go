@@ -6,7 +6,7 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-const ENV_PREFIX = "GRPC_SERVER"
+const envPrefix = "GRPC_SERVER"
 
 // Config app configuration
 type Config struct {
@@ -26,7 +26,7 @@ func InitConfig() *Config {
 		"connection string for storage")
 	flag.Parse()
 
-	err := envconfig.Process(ENV_PREFIX, &cfg)
+	err := envconfig.Process(envPrefix, &cfg)
 	if err != nil {
 		log.Fatal(err)
 	}

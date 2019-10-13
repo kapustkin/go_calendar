@@ -9,11 +9,11 @@ import (
 	"github.com/DATA-DOG/godog/gherkin"
 )
 
-func ExecRemoveTest(s *godog.Suite, test *notifyTest) {
+func ExecRemoveTest(s *godog.Suite, test *NotifyTest) {
 	s.Step(`^в ответе не будет события Message:$`, test.theResponseShouldEventNotFound)
 }
 
-func (test *notifyTest) theResponseShouldEventNotFound(body *gherkin.DocString) (err error) {
+func (test *NotifyTest) theResponseShouldEventNotFound(body *gherkin.DocString) (err error) {
 	var expected event
 	var actual []event
 

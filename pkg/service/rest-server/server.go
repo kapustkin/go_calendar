@@ -44,7 +44,10 @@ func Run(args []string) error {
 	// Healthchecks
 	r.Route("/", func(r chi.Router) {
 		r.Get("/ping", func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte("OK"))
+			_, err := w.Write([]byte("OK"))
+			if err != nil {
+				log.Fatal(err)
+			}
 		})
 	})
 

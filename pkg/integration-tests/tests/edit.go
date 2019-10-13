@@ -10,13 +10,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func ExecEditTest(s *godog.Suite, test *notifyTest) {
+func ExecEditTest(s *godog.Suite, test *NotifyTest) {
 
 	s.Step(`^посылаю "([^"]*)" запрос к "([^"]*)"$`, test.iSendRequestTo)
 	s.Step(`^ожидаю что код ответа будет (\d+)$`, test.theResponseCodeShouldBe)
 	s.Step(`^в ответе будет событие с Message:$`, test.theResponseShouldMatchJSONEvent)
-	s.Step(`^посылаю "([^"]*)" запрос к "([^"]*)" c "([^"]*)" и новым содержимым:$`, test.theSendRequestToWithDataReplaceUUID)
-	s.Step(`^в ответе будет измененное событие Message:$`, test.theResponseShouldMatchJSONEvent)
+	s.Step(`^посылаю "([^"]*)" запрос к "([^"]*)" c "([^"]*)" и новым содержимым:$`,
+		test.theSendRequestToWithDataReplaceUUID)
+	s.Step(`^в ответе будет измененное событие Message:$`,
+		test.theResponseShouldMatchJSONEvent)
 }
 
 type event struct {
@@ -25,7 +27,7 @@ type event struct {
 	Message   string
 }
 
-func (test *notifyTest) theResponseShouldMatchJSONEvent(body *gherkin.DocString) (err error) {
+func (test *NotifyTest) theResponseShouldMatchJSONEvent(body *gherkin.DocString) (err error) {
 	var expected event
 	var actual []event
 
@@ -49,7 +51,9 @@ func (test *notifyTest) theResponseShouldMatchJSONEvent(body *gherkin.DocString)
 	return fmt.Errorf("event not found")
 }
 
-func (test *notifyTest) theSendRequestToWithDataReplaceUUID(httpMethod, addr, contentType string, data *gherkin.DocString) (err error) {
+func (test *NotifyTest) theSendRequestToWithDataReplaceUUID(httpMethod, addr,
+	contentType string, data *gherkin.DocString) (err error) {
+
 	replacer := strings.NewReplacer("{REPLACE_UUID}", test.responseUUID)
 	data.Content = replacer.Replace(data.Content)
 	return test.theSendRequestToWithData(httpMethod, addr, contentType, data)
