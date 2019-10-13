@@ -6,6 +6,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/DATA-DOG/godog"
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/config"
@@ -40,13 +41,16 @@ func (test *NotifyTest) startKafkaConsuming(interface{}) {
 	test.stopSignal = make(chan struct{})
 	test.recievedSignal = make(chan struct{}, 1)
 	go func(stop <-chan struct{}) {
+		ctx := context.Background()
+		ctx, cancel := context.WithTimeout(ctx, 60*time.Second)
+		defer cancel()
 		for {
 			select {
 			case <-stop:
 				return
 			default:
 				{
-					message, err := kafkaConn.GetMessage(context.Background())
+					message, err := kafkaConn.GetMessage(ctx)
 					panicOnErr(err)
 					test.messagesMutex.Lock()
 					test.messages = append(test.messages, message)

@@ -7,7 +7,6 @@ networks:
 services:
   integration_tests:
     build: ./cmd/integration-tests
-    command: "true"
     links:
       - rest-server
       - kafka

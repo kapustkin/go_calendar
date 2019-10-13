@@ -4,7 +4,7 @@ format:
 	gofmt -w .
 
 test:
-	go test -cover ./...
+	go test -v -cover ./...
 
 lint:
 	$(shell go env GOPATH)/bin/golangci-lint run --enable-all
