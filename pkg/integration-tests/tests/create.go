@@ -6,7 +6,6 @@ import (
 	"log"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/DATA-DOG/godog"
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/config"
@@ -34,11 +33,12 @@ func (test *notifyTest) startKafkaConsuming(interface{}) {
 	// init kafka
 	kafkaConn, err := kafka.Init(conf)
 	panicOnErr(err)
+	test.kafkaConn = kafkaConn
 
 	test.messages = make([][]byte, 0)
 	test.messagesMutex = new(sync.RWMutex)
 	test.stopSignal = make(chan struct{})
-
+	test.recievedSignal = make(chan struct{}, 1)
 	go func(stop <-chan struct{}) {
 		for {
 			select {
@@ -51,6 +51,7 @@ func (test *notifyTest) startKafkaConsuming(interface{}) {
 					test.messagesMutex.Lock()
 					test.messages = append(test.messages, message)
 					test.messagesMutex.Unlock()
+					test.recievedSignal <- struct{}{}
 				}
 			}
 		}
@@ -58,16 +59,19 @@ func (test *notifyTest) startKafkaConsuming(interface{}) {
 }
 
 func (test *notifyTest) iReceiveEventWithText(text string) error {
-	time.Sleep(10 * time.Second) // На всякий случай ждём обработки евента
-
+	<-test.recievedSignal
 	test.messagesMutex.RLock()
 	defer test.messagesMutex.RUnlock()
+
+	//test.stopSignal <- struct{}{}
+	//panicOnErr(test.kafkaConn.Close())
 
 	for _, msg := range test.messages {
 		if strings.Contains(string(msg), text) {
 			return nil
 		}
 	}
+
 	return fmt.Errorf("event with text '%s' was not found in %s", text, test.messages)
 }
 

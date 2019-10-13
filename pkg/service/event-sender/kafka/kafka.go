@@ -36,9 +36,11 @@ func (k *Kafka) GetMessage(ctx context.Context) ([]byte, error) {
 }
 
 func (k *Kafka) Close() error {
-	err := k.conn.Close()
-	if err != nil {
-		return err
+	if k != nil {
+		err := k.conn.Close()
+		if err != nil {
+			return err
+		}
 	}
 	return nil
 }

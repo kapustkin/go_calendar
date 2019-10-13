@@ -16,10 +16,11 @@ import (
 
 type notifyTest struct {
 	// kafka
-	kafkaConn     *kafka.Kafka
-	messages      [][]byte
-	messagesMutex *sync.RWMutex
-	stopSignal    chan struct{}
+	kafkaConn      *kafka.Kafka
+	messages       [][]byte
+	messagesMutex  *sync.RWMutex
+	stopSignal     chan struct{}
+	recievedSignal chan struct{}
 	// rest
 	responseStatusCode int
 	responseBody       []byte
