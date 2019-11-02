@@ -10,6 +10,8 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/config"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/dal"
 	"github.com/kapustkin/go_calendar/pkg/service/rest-server/handlers/calendar"
+	prometeus "github.com/kapustkin/go_calendar/pkg/service/rest-server/middleware"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -28,6 +30,8 @@ func Run(args []string) error {
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
+	// prometeus middleware
+	r.Use(prometeus.Instrument)
 	r.Use(middleware.Timeout(60 * time.Second))
 	// Logging
 	switch conf.Logging {
@@ -59,5 +63,14 @@ func Run(args []string) error {
 		r.Post("/{user}/remove", calendarService.RemoveEvent)
 	})
 	log.Infof("listner started...")
+
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		err := http.ListenAndServe(":2112", nil)
+		if err != nil {
+			log.Fatalf("metrics listener error %v", err)
+		}
+	}()
+
 	return http.ListenAndServe(conf.Host, r)
 }

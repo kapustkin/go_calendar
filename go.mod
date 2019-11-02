@@ -5,6 +5,7 @@ go 1.12
 require (
 	github.com/DATA-DOG/godog v0.7.13
 	github.com/fatih/color v1.7.0 // indirect
+	github.com/felixge/httpsnoop v1.0.1
 	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/golang/mock v1.3.1 // indirect
@@ -24,6 +25,7 @@ require (
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d // indirect
 	github.com/pelletier/go-toml v1.4.0 // indirect
 	github.com/processout/grpc-go-pool v1.2.1
+	github.com/prometheus/client_golang v0.9.3
 	github.com/segmentio/kafka-go v0.3.3
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/afero v1.2.2 // indirect
