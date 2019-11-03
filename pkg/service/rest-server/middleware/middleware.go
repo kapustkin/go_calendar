@@ -12,7 +12,7 @@ import (
 )
 
 var requestDuration = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-	Name: "rest-server_request_duration",
+	Name: "rest_server_request_duration",
 	Help: "The HTTP request latencies in milliseconds.",
 }, []string{"method", "route", "status"})
 
