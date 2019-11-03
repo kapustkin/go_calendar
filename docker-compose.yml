@@ -180,7 +180,7 @@ services:
       - 3000:3000
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning/:/etc/grafana/provisioning/
+      - ./scripts/prometheus/grafana/provisioning/:/etc/grafana/provisioning/
     env_file:
       - ./scripts/prometheus/grafana/config.monitoring
     networks:

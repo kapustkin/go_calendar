@@ -9,6 +9,7 @@ import (
 	"github.com/kapustkin/go_calendar/pkg/logger"
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/config"
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/kafka"
+	"github.com/kapustkin/go_calendar/pkg/service/event-sender/prometheus"
 	"github.com/kapustkin/go_calendar/pkg/service/event-sender/sender"
 )
 
@@ -18,6 +19,8 @@ func Run() error {
 	log.Info("starting app...")
 	conf := config.InitConfig()
 	log.Infof("use config: %v", conf)
+	//Monitroring
+	prometheus.Init()
 	err := execute(conf)
 	if err != nil {
 		return err
@@ -41,5 +44,6 @@ func execute(c *config.Config) error {
 			return fmt.Errorf("failed GetMessage from kafka: %v", err.Error())
 		}
 		sender.Send(message)
+		prometheus.RegisterEvent()
 	}
 }

@@ -31,7 +31,7 @@ func Run(args []string) error {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	// prometeus middleware
-	r.Use(prometeus.Instrument)
+	r.Use(prometeus.Monitoring)
 	r.Use(middleware.Timeout(60 * time.Second))
 	// Logging
 	switch conf.Logging {
