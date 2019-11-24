@@ -10,8 +10,10 @@ import (
 
 //nolint
 var regCounter = prometheus.NewCounter(prometheus.CounterOpts{
-	Name: "event_sender_message_counter",
-	Help: "кол-во отправленных оповещений",
+	Namespace: "calendar",
+	Subsystem: "eventsender",
+	Name:      "messages",
+	Help:      "message per time",
 })
 
 // Init запуск мониторинга

@@ -23,6 +23,8 @@ func Run() error {
 	log.Infof("use config: %v", conf)
 	db := getStorage(conf.StorageType, conf.ConnectionString)
 
+	log.Panicf("storage type not supported")
+
 	lis, err := net.Listen("tcp", conf.Host)
 	if err != nil {
 		return err

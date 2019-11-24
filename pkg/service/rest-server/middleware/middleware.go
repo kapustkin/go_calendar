@@ -12,13 +12,24 @@ import (
 )
 
 var requestDuration = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-	Name: "rest_server_request_duration",
-	Help: "The HTTP request latencies in milliseconds.",
+	Namespace: "calendar",
+	Subsystem: "restserver",
+	Name:      "request_duration_milliseconds",
+	Help:      "The HTTP request latencies in milliseconds.",
 }, []string{"method", "route", "status"})
+
+var requestCounter = prometheus.NewHistogram(prometheus.HistogramOpts{
+	Namespace: "calendar",
+	Subsystem: "restserver",
+	Name:      "requests",
+	Help:      "Operation per time",
+	Buckets:   prometheus.LinearBuckets(0, 10, 20),
+})
 
 //nolint
 func init() {
 	prometheus.MustRegister(requestDuration)
+	prometheus.MustRegister(requestCounter)
 }
 
 func Monitoring(next http.Handler) http.Handler {
@@ -33,5 +44,7 @@ func Monitoring(next http.Handler) http.Handler {
 		requestDuration.WithLabelValues(
 			r.Method, routePattern, strconv.Itoa(m.Code),
 		).Observe(duration)
+
+		requestCounter.Observe(1)
 	})
 }

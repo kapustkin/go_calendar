@@ -2,12 +2,10 @@ version: '3.7'
 
 volumes:
     prometheus_data: {}
-    grafana_data: {}
 
 networks:
   app:
     driver: bridge
-  front-tier:
   back-tier:
 
 services:
@@ -74,6 +72,8 @@ services:
       POSTGRES_USER: calendar
       POSTGRES_PASSWORD: password
       POSTGRES_DB: ms_calendar
+    #ports:
+    # - "5432:5432"
     volumes:
       - ./scripts/setup.sql:/docker-entrypoint-initdb.d/setup.sql
     networks:
@@ -101,7 +101,20 @@ services:
     networks: 
       - app
 
+
 # ------------------------------ prometheus ------------------------------
+  postgres-exporter:
+    image: wrouesnel/postgres_exporter
+    volumes:
+      - ./scripts/postgres-exporter/:/config
+    command: 
+      - '--extend.query-path=/config/quieries.yaml'
+    environment:
+      DATA_SOURCE_NAME: "postgres://calendar:password@postgres/ms_calendar?sslmode=disable"
+      PG_EXPORTER_DISABLE_SETTINGS_METRICS: "true"
+    networks:
+      - app
+
   prometheus:
     image: prom/prometheus:v2.1.0
     volumes:
@@ -170,20 +183,3 @@ services:
     restart: always
     #deploy:
     #  mode: global
-
-  grafana:
-    image: grafana/grafana
-    user: "104"
-    depends_on:
-      - prometheus
-    ports:
-      - 3000:3000
-    volumes:
-      - grafana_data:/var/lib/grafana
-      - ./scripts/prometheus/grafana/provisioning/:/etc/grafana/provisioning/
-    env_file:
-      - ./scripts/prometheus/grafana/config.monitoring
-    networks:
-      - back-tier
-      - front-tier
-    restart: always

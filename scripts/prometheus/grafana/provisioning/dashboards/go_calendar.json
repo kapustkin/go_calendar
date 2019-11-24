@@ -59,7 +59,7 @@
         "steppedLine": false,
         "targets": [
           {
-            "expr": "irate(request_duration_milliseconds_count[5m])",
+            "expr": "irate(calendar_restserver_request_duration_milliseconds_count[5m])",
             "instant": false,
             "refId": "A"
           }
